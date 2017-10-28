@@ -11,8 +11,94 @@ int ansiSupport = false;
 void displayResult();
 void displayFunc(char *, int);
 
+
+typedef struct Data Data;
+struct Data
+{
+    char key[256];
+    void *value;
+    int dataType;
+};
+
+int yamlTableInsert(int size, Data *data, char *tableName)
+{
+    FILE *tableFile = NULL;
+    char type[520];
+    int i;
+
+    tableFile = fopen(tableName, "a");
+    if(tableFile == NULL) {
+        return false;
+    }
+
+    for(i = 0; i < size; i++) {
+        switch(data[i].dataType) {
+            case 1:
+                sprintf(type, "%s: [%d, \"%d\"]", data[i].key, data[i].dataType, *((int *)data[i].value));
+                break;
+            case 2:
+                sprintf(type, "%s: [%d, \"%lf\"]", data[i].key, data[i].dataType, *((double *)data[i].value));
+                break;
+            case 4:
+                sprintf(type, "%s: [%d, \"%c\"]", data[i].key, data[i].dataType, *((char *)data[i].value));
+                break;
+            case 8:
+                sprintf(type, "%s: [%d, \"%s\"]", data[i].key, data[i].dataType, *((char **)data[i].value));
+                break;
+            default:
+                return false;
+        }
+
+        fprintf(tableFile, "%s\n", type);
+    }
+
+    return true;
+}
+
 int main(int argc, char **argv)
 {
+    // debug
+    /* const char *a = "name: [4, \"toto\"]";
+    char key[256];
+    char value[256];
+    int dataType;
+
+    int s = sscanf(a, "%[^:]: [%d, \"%[^\"]]", key, &dataType, value);
+
+    if(s == 3) {
+        printf("[%s][%s][%d]", key, value, dataType);
+    }
+
+    Data *data = malloc(sizeof(Data));
+    sprintf(data.key, "%d\n", key); */
+
+    int size = 3;
+    Path path = pathParse("table", "database");
+    Data *data = malloc(sizeof(Data) * size);
+
+    double b = 3.14;
+    char *c = "toto";
+    char d = 'T';
+
+    sprintf(data[0].key, "%s", "average");
+    data[0].value = &b;
+    data[0].dataType = 2;
+
+    sprintf(data[1].key, "%s", "name");
+    data[1].value = &c;
+    data[1].dataType = 8;
+
+    sprintf(data[2].key, "%s", "initialLetter");
+    data[2].value = &d;
+    data[2].dataType = 4;
+
+    int _status = yamlTableInsert(size, data, path.path);
+    printf("status: %d [%s]\n", _status, path.path);
+    free(data);
+
+    return 0;
+    // debug
+
     int status = true;
     int startIndex = true;
 
@@ -24,7 +110,7 @@ int main(int argc, char **argv)
     }
 
     do {
-        status = interface.prompt(startIndex, displayFunc, &interface.options, "Create a database", "Add a table", "Delete a table", "Drop a database", NULL);
+        status = interface.prompt(startIndex, displayFunc, &interface.options, "Create a database", "Drop a database", "Add a table", "Insert a line in table", "Delete a line in table", "Drop a table", NULL);
         startIndex = false;
     } while(status);
 
@@ -78,19 +164,22 @@ void displayFunc(char *value, int index)
             break;
         case 2:
             database = interface.input("database> ");
-            table = interface.input("table> ");
-            yaml.table.create(database, table);
+            yaml.database.drop(database);
 
             break;
         case 3:
             database = interface.input("database> ");
             table = interface.input("table> ");
-            yaml.table.delete(database, table);
+            yaml.table.create(database, table);
 
             break;
         case 4:
+        case 5:
+            break;
+        case 6:
             database = interface.input("database> ");
-            yaml.database.drop(database);
+            table = interface.input("table> ");
+            yaml.table.drop(database, table);
 
             break;
     }

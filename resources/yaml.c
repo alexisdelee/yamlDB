@@ -11,7 +11,7 @@
 void yamlDatabaseCreate(char *);
 void yamlDatabaseDrop(char *);
 void yamlTableCreate(char *, char *);
-void yamlTableDelete(char *, char *);
+void yamlTableDrop(char *, char *);
 // void yamlTableInsert(char *, char *);
 
 Table tableInit()
@@ -19,7 +19,7 @@ Table tableInit()
     Table table;
 
     table.create = yamlTableCreate;
-    table.delete = yamlTableDelete;
+    table.drop = yamlTableDrop;
 
     return table;
 }
@@ -129,12 +129,15 @@ void yamlTableCreate(char *dbName, char *tableName)
     tableFile = fopen(path.path, "w");
     if(tableFile) {
         fclose(tableFile);
+    } else {
+        danger(false, "Exception: unknown error\n");
+        return;
     }
 
     success("Table \"%s\" was created\n", tableName);
 }
 
-void yamlTableDelete(char *dbName, char *tableName)
+void yamlTableDrop(char *dbName, char *tableName)
 {
     Path path = pathParse(tableName, dbName);
 

@@ -12,7 +12,7 @@ typedef struct Table Table;
 struct Table
 {
     void (*create)(char *, char *);
-    void (*delete)(char *, char *);
+    void (*drop)(char *, char *);
 };
 
 typedef struct Yaml Yaml;
