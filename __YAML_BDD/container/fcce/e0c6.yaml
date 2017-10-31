@@ -1,0 +1,5 @@
+proto:
+  - dataTypes: [2, 8, 4]
+  - keys: ["average", "name", "initialLetter"]
+
+75e8: [3.140000, "toto", 'T']

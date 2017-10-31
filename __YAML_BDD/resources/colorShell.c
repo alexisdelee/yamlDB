@@ -38,8 +38,10 @@ void warningList(char *format, ...)
     if(ansiSupport) {
         vsprintf(secureString, format, arglist);
 
+        // printf("\n[%s]\n", secureString);
+
         printf(ANSI_COLOR_CYAN "%.*s" ANSI_COLOR_YELLOW, index, secureString);
-        printf("%s" ANSI_COLOR_RESET, secureString + index);
+        printf("%s" ANSI_COLOR_RESET, secureString + index );
     } else {
         vprintf(format, arglist);
     }

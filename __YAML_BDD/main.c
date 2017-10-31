@@ -4,13 +4,14 @@
 
 #include "resources/toolbox.h"
 #include "resources/yaml.h"
+#include "resources/colorShell.h"
 #include "resources/interface.h"
 
 int ansiSupport = false;
 
 void displayResult();
 void displayFunc(char *, int);
-
+void displayFuncTable(char *, int);
 
 typedef struct Data Data;
 struct Data
@@ -72,7 +73,7 @@ int main(int argc, char **argv)
     Data *data = malloc(sizeof(Data));
     sprintf(data.key, "%d\n", key); */
 
-    int size = 3;
+    /* int size = 3;
     Path path = pathParse("table", "database");
     Data *data = malloc(sizeof(Data) * size);
 
@@ -96,7 +97,7 @@ int main(int argc, char **argv)
     printf("status: %d [%s]\n", _status, path.path);
     free(data);
 
-    return 0;
+    return 0; */
     // debug
 
     int status = true;
@@ -108,6 +109,17 @@ int main(int argc, char **argv)
     if(argc >= 2 && !strcmp(argv[1], "--color-mode")) {
         ansiSupport = true;
     }
+
+    welcome("Starting the database shell console...\n\n");
+
+    printf(" /$$     /$$ /$$$$$$  /$$      /$$ /$$             /$$$$$$$  /$$$$$$$ \n");
+    printf("|  $$   /$$//$$__  $$| $$$    /$$$| $$            | $$__  $$| $$__  $$ \n");
+    printf(" \\  $$ /$$/| $$  \\ $$| $$$$  /$$$$| $$            | $$  \\ $$| $$  \\ $$ \n");
+    printf("  \\  $$$$/ | $$$$$$$$| $$ $$/$$ $$| $$            | $$  | $$| $$$$$$$ \n");
+    printf("   \\  $$/  | $$__  $$| $$  $$$| $$| $$            | $$  | $$| $$__  $$ \n");
+    printf("    | $$   | $$  | $$| $$\\  $ | $$| $$            | $$  | $$| $$  \\ $$ \n");
+    printf("    | $$   | $$  | $$| $$ \\/  | $$| $$$$$$$$      | $$$$$$$/| $$$$$$$/ \n");
+    printf("    |__/   |__/  |__/|__/     |__/|________/      |_______/ |_______/ \n\n");
 
     do {
         status = interface.prompt(startIndex, displayFunc, &interface.options, "Create a database", "Drop a database", "Add a table", "Insert a line in table", "Delete a line in table", "Drop a table", NULL);
@@ -152,11 +164,17 @@ void displayResult()
 void displayFunc(char *value, int index)
 {
     Interface interface = interfaceInit();
+    Interface _interface;
     Yaml yaml = yamlInit();
     char *database = NULL;
     char *table = NULL;
+    int status = true;
+    int startIndex = true;
 
     switch(index) {
+        case 0:
+            success("\nClosing the database shell console...\n");
+            return;
         case 1:
             database = interface.input("database> ");
             yaml.database.create(database);
@@ -168,9 +186,21 @@ void displayFunc(char *value, int index)
 
             break;
         case 3:
-            database = interface.input("database> ");
+            /* database = interface.input("database> ");
             table = interface.input("table> ");
-            yaml.table.create(database, table);
+            yaml.table.create(database, table); */
+
+            _interface = interfaceInit();
+            _interface.options.quit = true;
+            _safeStrdup(&_interface.options.quitLabel, "Save prototype");
+
+            printf("\n");
+            welcome("Starting the table shell console...\n\n");
+
+            do {
+                status = _interface.prompt(startIndex, displayFuncTable, &_interface.options, "Integer", "Real", "Char", "String", NULL);
+                startIndex = false;
+            } while(status);
 
             break;
         case 4:
@@ -186,4 +216,15 @@ void displayFunc(char *value, int index)
 
     _safeFree(&database);
     _safeFree(&table);
+}
+
+void displayFuncTable(char *value, int index)
+{
+    switch(index) {
+        case 0:
+            success("\nClosing the table shell console...\n\n");
+            return;
+        default:
+            printf("[%s] %d\n", value, index);
+    }
 }

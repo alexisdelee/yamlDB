@@ -14,6 +14,16 @@ void _safeFree(char **string)
     }
 }
 
+void _safeStrdup(char **string, char *content)
+{
+    _safeFree(string);
+    *string = strdup(content);
+
+    if(string == NULL) {
+        danger(true, "Exception: error with malloc\n");
+    }
+}
+
 char* uniqueIdentifier(char *seed)
 {
     int checksum = 0;

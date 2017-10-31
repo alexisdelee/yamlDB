@@ -8,7 +8,7 @@
 typedef struct Options Options;
 struct Options
 {
-    char *title;
+    char *quitLabel;
     char *label;
     int ansiSupport;
     int quit;

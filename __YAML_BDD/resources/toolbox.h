@@ -25,6 +25,7 @@ struct Path
 };
 
 void _safeFree(char **);
+void _safeStrdup(char **, char *);
 char* uniqueIdentifier(char *); // empty string for timestamp as seed
 int _polyfillMkdir(char *);
 int _polyfillRmdir(char *);

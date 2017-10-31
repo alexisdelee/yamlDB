@@ -18,20 +18,21 @@ char *interfaceInput(char *);
 void _trim(char *);
 int _getInteger(char *);
 void _garbageCollector(char ***, int);
-void _free(Options *);
 
 Interface interfaceInit()
 {
     Interface interface;
 
-    const char *defaultTitle = "Starting the database shell console...\n";
+    interface.options.label = strdup(">");
+    interface.options.quit = false;
+    interface.options.quitLabel = strdup("Exit interpreter");
 
-    if((interface.options.title = strdup(defaultTitle)) == NULL) {
+    if(interface.options.label == NULL || interface.options.quitLabel == NULL) {
+        _safeFree(&interface.options.label);
+        _safeFree(&interface.options.quitLabel);
+
         danger(true, "Exception: error with malloc\n");
     }
-
-    interface.options.label = ">";
-    interface.options.quit = false;
 
     interface.load = interfaceLoad;
     interface.prompt = interfacePrompt;
@@ -68,18 +69,14 @@ void interfaceLoad(Options *options, char *configPath)
             command[delimiter] = '\0';
         }
 
-        if(!strcmp(command, "title")) {
-            _safeFree(&options->title);
-
-            if((options->title = strdup(line + delimiter + 1)) == NULL) {
-                danger(true, "Exception: error with malloc\n");
-            }
-        } else if(!strcmp(command, "quit")) {
+        if(!strcmp(command, "quit")) {
             if(!strcmp(line + delimiter + 1, "false")) {
                 options->quit = false;
             } else if(!strcmp(line + delimiter + 1, "true")) {
                 options->quit = true;
             }
+        } else if(!strcmp(command, "quitLabel")) {
+            _safeStrdup(&options->quitLabel, line + delimiter + 1);
         }
 
         _safeFree(&command);
@@ -98,6 +95,7 @@ int interfacePrompt(int welcomeMode, void (*callback)(char *, int), Options *opt
     int isExitOption = false;
     const int LIMIT_STRING = (int)floor(log10(counter)) + 1;
     char response[256];
+    char *quitLabel;
     va_list args;
 
     if(choices == NULL) {
@@ -105,19 +103,6 @@ int interfacePrompt(int welcomeMode, void (*callback)(char *, int), Options *opt
     }
 
     va_start(args, options);
-
-    if(welcomeMode) {
-        welcome("%s\n", options->title);
-
-        printf(" /$$     /$$ /$$$$$$  /$$      /$$ /$$             /$$$$$$$  /$$$$$$$ \n");
-        printf("|  $$   /$$//$$__  $$| $$$    /$$$| $$            | $$__  $$| $$__  $$ \n");
-        printf(" \\  $$ /$$/| $$  \\ $$| $$$$  /$$$$| $$            | $$  \\ $$| $$  \\ $$ \n");
-        printf("  \\  $$$$/ | $$$$$$$$| $$ $$/$$ $$| $$            | $$  | $$| $$$$$$$ \n");
-        printf("   \\  $$/  | $$__  $$| $$  $$$| $$| $$            | $$  | $$| $$__  $$ \n");
-        printf("    | $$   | $$  | $$| $$\\  $ | $$| $$            | $$  | $$| $$  \\ $$ \n");
-        printf("    | $$   | $$  | $$| $$ \\/  | $$| $$$$$$$$      | $$$$$$$/| $$$$$$$/ \n");
-        printf("    |__/   |__/  |__/|__/     |__/|________/      |_______/ |_______/ \n\n");
-    }
 
     while((choice = va_arg(args, char *))) {
         if((choices[counter] = malloc(sizeof(char) * 501)) == NULL) {
@@ -139,7 +124,14 @@ int interfacePrompt(int welcomeMode, void (*callback)(char *, int), Options *opt
 
     if(options->quit) {
         if(welcomeMode) {
-            warningList("\n[%d] Exit interpreter\n", 0);
+            // warningList("\n[%d] Exit interpreter\n", 0);
+            quitLabel = malloc(sizeof(char) * (strlen(options->quitLabel) + 6 + 1));
+            sprintf(quitLabel, "[%d] %s", 0, options->quitLabel);
+
+            printf("\n");
+            warningList(quitLabel);
+
+            _safeFree(&quitLabel);
         }
 
         isExitOption = true;
@@ -148,7 +140,7 @@ int interfacePrompt(int welcomeMode, void (*callback)(char *, int), Options *opt
     va_end(args);
 
     if(welcomeMode) {
-        printf("\n");
+        printf("\n\n");
     }
 
     do {
@@ -162,24 +154,30 @@ int interfacePrompt(int welcomeMode, void (*callback)(char *, int), Options *opt
         }
 
         index = _getInteger(&response[0]); // cast char[] to char *
-        if(isExitOption && index == 0) {
+        /* if(isExitOption && index == 0) {
             _garbageCollector(&choices, counter + 1);
-            _free(options);
+            _safeFree(&options->label);
+            _safeFree(&options->quitLabel);
 
             return false;
-        }
-    } while(index < 1 || index > counter);
+        } */
+    } while(index < 0 || index > counter);
 
-    // printf("[before callback]\n");
-    callback(choices[index - 1], index);
+    if(isExitOption && !index) {
+        callback(NULL, 0);
+    } else {
+        callback(choices[index - 1], index);
+    }
 
-    // printf("[before garbage collector]\n");
     _garbageCollector(&choices, counter + 1);
+    _safeFree(&options->label);
+    _safeFree(&options->quitLabel);
 
-    // printf("[after garbage collector]\n");
-    _free(options);
-
-    return true;
+    if(isExitOption && !index) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 char *interfaceInput(char *header)
@@ -202,12 +200,6 @@ char *interfaceInput(char *header)
     }
 
     return response;
-}
-
-void _free(Options *options)
-{
-    free(options->title);
-    free(options->label);
 }
 
 void _trim(char *value)

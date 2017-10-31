@@ -1,6 +1,9 @@
 /bin/
 /obj/
 /container/
+/.idea/
+/cmake-build-debug/
 *.cbp
 *.depend
 *.layout
+CMakeLists.txt
