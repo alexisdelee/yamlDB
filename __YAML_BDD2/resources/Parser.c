@@ -5,6 +5,22 @@
 
 #include "Parser.h"
 
+void build(char *, Node **, void (*callback)(char *s));
+void search(char *, Node **);
+void statistic(Node *, int);
+Token *_split(char *);
+int regexp(char *, char *);
+
+Parser parserInit()
+{
+    Parser parser;
+
+    parser.build = build;
+    parser.search = search;
+
+    return parser;
+};
+
 Node *initNode(char *data, char *type)
 {
 	Node *seed = malloc(sizeof(Node));
@@ -250,7 +266,7 @@ int regexp(char *rgx, char *str)
 			return true;
 		}
 	} else if(!strcmp(rgx, "@TABLE")) {
-		status = sscanf(str, "%255[^.]%255s", string[0], string[1]);
+		status = sscanf(str, "%255[^.].%255s", string[0], string[1]);
 		fflush(stdin);
 
 		if(status == 2) {

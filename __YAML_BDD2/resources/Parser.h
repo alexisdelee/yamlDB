@@ -21,12 +21,15 @@ struct Token
     size_t size;
 };
 
+typedef struct Parser Parser;
+struct Parser
+{
+    void (*build)(char *, Node **, void (*callback)(char *s));
+    void (*search)(char *, Node **);
+};
+
+Parser parserInit();
 Node *initNode(char *, char *);
-void build(char *s, Node **, void (*callback)(char *s));
-void search(char *s, Node **);
-void statistic(Node *, int);
 void freeTree(Node *);
-Token *_split(char *);
-int regexp(char *, char *);
 
 #endif // PARSER_H_INCLUDED
