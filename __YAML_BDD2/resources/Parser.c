@@ -16,7 +16,8 @@ Parser parserInit()
     Parser parser;
 
     parser.build = build;
-    parser.search = search;
+    parser.sql = search;
+    parser.statistic = statistic;
 
     return parser;
 };

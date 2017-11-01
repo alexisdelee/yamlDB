@@ -25,7 +25,8 @@ typedef struct Parser Parser;
 struct Parser
 {
     void (*build)(char *, Node **, void (*callback)(char *s));
-    void (*search)(char *, Node **);
+    void (*sql)(char *, Node **);
+    void (*statistic)(Node *, int);
 };
 
 Parser parserInit();
