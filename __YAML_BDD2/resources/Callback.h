@@ -4,18 +4,18 @@
 typedef struct Database Database;
 struct Database
 {
-    void (*create)(char *);
-    void (*drop)(char *);
+    void (*create)(char *, void *);
+    void (*drop)(char *, void *);
 };
 
 typedef struct Table Table;
 struct Table
 {
-    void (*create)(char *);
-    void (*drop)(char *);
-    void (*insert)(char *);
-    void (*update)(char *);
-    void (*delete)(char *);
+    void (*create)(char *, void *);
+    void (*drop)(char *, void *);
+    void (*insert)(char *, void *);
+    void (*update)(char *, void *);
+    void (*delete)(char *, void *);
 };
 
 typedef struct Callback Callback;

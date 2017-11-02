@@ -2,15 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "dependancies.h"
 #include "Callback.h"
 
-void createDatabaseFunc(char *);
-void dropDatabaseFunc(char *);
-void createTableFunc(char *);
-void dropTableFunc(char *);
-void insertTableFunc(char *);
-void updateTableFunc(char *);
-void deleteTableFunc(char *);
+void createDatabaseFunc(char *, void *);
+void dropDatabaseFunc(char *, void *);
+void createTableFunc(char *, void *);
+void dropTableFunc(char *, void *);
+void insertTableFunc(char *, void *);
+void updateTableFunc(char *, void *);
+void deleteTableFunc(char *, void *);
 
 Table tableInit()
 {
@@ -47,37 +48,49 @@ Callback callbackInit()
 
 // callbacks: privates methods
 
-void createDatabaseFunc(char *s)
+void createDatabaseFunc(char *s, void *_parameters)
 {
-
+    Token *parameters = (Token *)_parameters;
+    // do something
 }
 
-void dropDatabaseFunc(char *s)
+void dropDatabaseFunc(char *s, void *_parameters)
 {
-
+    Token *parameters = (Token *)_parameters;
+    // do something
 }
 
-void createTableFunc(char *s)
+void createTableFunc(char *s, void *_parameters)
 {
+    Token *parameters = (Token *)_parameters;
+    int i;
 
+	printf("[%s]\n", s);
+	for(i = 0; i < parameters->size; i++) {
+		printf("[%s]\n", parameters->data[i]);
+	}
 }
 
-void dropTableFunc(char *s)
+void dropTableFunc(char *s, void *_parameters)
 {
-
+    Token *parameters = (Token *)_parameters;
+    // do something
 }
 
-void insertTableFunc(char *s)
+void insertTableFunc(char *s, void *_parameters)
 {
-
+    Token *parameters = (Token *)_parameters;
+    // do something
 }
 
-void updateTableFunc(char *s)
+void updateTableFunc(char *s, void *_parameters)
 {
-
+    Token *parameters = (Token *)_parameters;
+    // do something
 }
 
-void deleteTableFunc(char *s)
+void deleteTableFunc(char *s, void *_parameters)
 {
-
+    Token *parameters = (Token *)_parameters;
+    // do something
 }

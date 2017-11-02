@@ -2,14 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdarg.h>
 
+#include "dependancies.h"
 #include "Parser.h"
 
-void build(char *, Node **, void (*callback)(char *s));
+void build(char *, Node **, void (*callback)(char *, void *));
 void search(char *, Node **);
 void statistic(Node *, int);
 Token *_split(char *);
-int regexp(char *, char *);
+void addParameters(void *, ...);
+int regexp(char *, char *, void *);
 
 Parser parserInit()
 {
@@ -35,7 +38,7 @@ Node *initNode(char *data, char *type)
 	return seed;
 }
 
-void build(char *s, Node **tree, void (*callback)(char *s))
+void build(char *s, Node **tree, void (*callback)(char *, void *))
 {
 	Token *token = _split(s);
 	Node *seed = *tree;
@@ -77,8 +80,12 @@ void build(char *s, Node **tree, void (*callback)(char *s))
 void search(char *s, Node **tree)
 {
 	Token *token = _split(s);
+	Token parameters;
 	Node *seed = *tree;
 	int active, i, j;
+
+	parameters.data = NULL;
+    parameters.size = 0;
 
 	for(i = 0; i < token->size; i++) {
 		active = false;
@@ -92,7 +99,7 @@ void search(char *s, Node **tree)
 						break;
 					}
 				} else {
-					if(regexp(seed->next[j]->data, token->data[i])) {
+					if(regexp(seed->next[j]->data, token->data[i], &parameters)) {
 						seed = seed->next[j];
 						active = true;
 						break;
@@ -106,8 +113,14 @@ void search(char *s, Node **tree)
 
 	if(active && seed->next == NULL) {
 		if(seed->callback) {
-			seed->callback(s);
+			seed->callback(s, &parameters);
 		}
+
+		for(i = 0; i < parameters.size; i++) {
+			free(parameters.data[i]);
+		}
+
+		free(parameters.data);
 	} else {
 		printf("\"%s\" is not recognised as an internal command\n", s);
 	}
@@ -254,7 +267,30 @@ Token *_split(char *buffer)
     return token;
 }
 
-int regexp(char *rgx, char *str)
+void addParameters(void *_parameters, ...)
+{
+    Token *parameters = (Token *)_parameters;
+	va_list args;
+	char *data;
+
+	va_start(args, _parameters);
+
+	while((data = va_arg(args, char *))) {
+		parameters->data = realloc(parameters->data, sizeof(char *) * ++parameters->size);
+		if(parameters->data == NULL) {
+			exit(-1);
+		}
+
+		parameters->data[parameters->size - 1] = strdup(data);
+		if(parameters->data[parameters->size - 1] == NULL) {
+			exit(-1);
+		}
+	}
+
+	va_end(args);
+}
+
+int regexp(char *rgx, char *str, void *_parameters)
 {
 	char string[10][256];
 	int status;
@@ -264,6 +300,7 @@ int regexp(char *rgx, char *str)
 		fflush(stdin);
 
 		if(status == 1) {
+            addParameters(_parameters, string[0], NULL);
 			return true;
 		}
 	} else if(!strcmp(rgx, "@TABLE")) {
@@ -271,17 +308,23 @@ int regexp(char *rgx, char *str)
 		fflush(stdin);
 
 		if(status == 2) {
+            addParameters(_parameters, string[0], string[1], NULL);
 			return true;
 		}
 	} else if(!strcmp(rgx, "@ARGUMENTS")) {
-		status = sscanf(str, "%255s", string[0]);
+		/* status = sscanf(str, "%255s", string[0]); // TODO
 		fflush(stdin);
 
 		if(status == 1) {
+            addParameters(parameters, string[0], NULL);
 			return true;
-		}
+		} */
+
+		addParameters(_parameters, str, NULL);
+		return true;
 	} else if(!strcmp(rgx, "@OPERATOR")) {
 		if(!strcmp(str, "=") || !strcmp(str, "<>")) {
+            addParameters(_parameters, str, NULL);
 			return true;
 		}
 	} else {

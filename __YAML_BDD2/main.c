@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "resources/dependancies.h"
 #include "resources/arguments.h"
 #include "resources/Parser.h"
 #include "resources/Callback.h"

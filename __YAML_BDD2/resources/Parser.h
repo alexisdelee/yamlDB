@@ -1,9 +1,6 @@
 #ifndef PARSER_H_INCLUDED
 #define PARSER_H_INCLUDED
 
-#define true 1
-#define false 0
-
 typedef struct Node Node;
 struct Node
 {
@@ -11,23 +8,15 @@ struct Node
 	char type[256];
 	int size;
 	struct Node **next;
-	void (*callback)(char *s);
+	void (*callback)(char *, void *);
 };
 
-typedef struct Token Token;
-struct Token
+typedef struct
 {
-    char **data;
-    size_t size;
-};
-
-typedef struct Parser Parser;
-struct Parser
-{
-    void (*build)(char *, Node **, void (*callback)(char *s));
+    void (*build)(char *, Node **, void (*callback)(char *, void *));
     void (*sql)(char *, Node **);
     void (*statistic)(Node *, int);
-};
+} Parser;
 
 Parser parserInit();
 Node *initNode(char *, char *);
