@@ -41,11 +41,13 @@ int main(int argc, char **argv)
 	// parser.build("select @ARGUMENTS from @TABLE where @KEY @OPERATOR @VALUE", &tree, func);
 	// parser.build("select @ARGUMENTS from @TABLE", &tree, func);
 
-	parser.sql("create table esgi.test (name VARCHAR)", &tree);
-
 	if(statisticModeOption) {
         parser.statistic(tree, 1);
+        printf("\n");
 	}
+
+	// parser.sql("create table esgi.test (name VARCHAR, age REAL)", &tree);
+	parser.sql("update esgi.test set name = toto where id = ec9f", &tree);
 
 	freeTree(tree);
 	// free /* double free or corruption */

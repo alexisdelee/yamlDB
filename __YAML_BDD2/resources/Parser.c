@@ -10,7 +10,9 @@
 void build(char *, Node **, void (*callback)(char *, void *));
 void search(char *, Node **);
 void statistic(Node *, int);
+void parseArguments(void *, char *);
 Token *_split(char *);
+void allocArguments(void *, char *);
 void addParameters(void *, ...);
 int regexp(char *, char *, void *);
 
@@ -168,6 +170,62 @@ void freeTree(Node *seed)
 	}
 }
 
+void parseArguments(void *_parameters, char *buffer)
+{
+    char *buf = malloc(sizeof(char) * (strlen(buffer) + 1));
+    char *p, *start_of_word;
+    int c;
+    enum states { DULL, IN_WORD, IN_STRING } state = DULL;
+
+    if(buf == NULL) {
+        exit(-1);
+    }
+
+    buf[0] = '\0';
+    strcpy(buf, buffer);
+
+    for (p = buf; *p != '\0'; p++) {
+        c = (unsigned char) *p;
+
+        switch (state) {
+            case DULL:
+                if (isspace(c)) {
+                  continue;
+                }
+
+                if (c == '"') {
+                    state = IN_STRING;
+                    start_of_word = p + 1;
+
+                    continue;
+                }
+
+                state = IN_WORD;
+                start_of_word = p;
+
+                continue;
+            case IN_STRING:
+            case IN_WORD:
+                if ((state == IN_STRING && (c == '"' || c == ',' || c == '='))
+                    || (state == IN_WORD && (isspace(c) || c == ',' || c == ','))) {
+                    *p = 0;
+
+                    allocArguments(_parameters, start_of_word);
+
+                    state = DULL;
+                }
+
+                continue;
+        }
+    }
+
+    if(state != DULL) {
+        allocArguments(_parameters, start_of_word);
+    }
+
+    free(buf);
+}
+
 Token *_split(char *buffer)
 {
     Token *token = malloc(sizeof(Token));
@@ -267,6 +325,21 @@ Token *_split(char *buffer)
     return token;
 }
 
+void allocArguments(void *_parameters, char *value)
+{
+    Token *parameters = (Token *)_parameters;
+
+    parameters->data = realloc(parameters->data, sizeof(char *) * ++parameters->size);
+    if(parameters->data == NULL) {
+        exit(-1);
+    }
+
+    parameters->data[parameters->size - 1] = strdup(value);
+    if(parameters->data[parameters->size - 1] == NULL) {
+        exit(-1);
+    }
+}
+
 void addParameters(void *_parameters, ...)
 {
     Token *parameters = (Token *)_parameters;
@@ -292,7 +365,7 @@ void addParameters(void *_parameters, ...)
 
 int regexp(char *rgx, char *str, void *_parameters)
 {
-	char string[10][256];
+	char string[2][256];
 	int status;
 
 	if(!strcmp(rgx, "@DATABASE") || !strcmp(rgx, "@KEY") || !strcmp(rgx, "@VALUE")) {
@@ -312,15 +385,7 @@ int regexp(char *rgx, char *str, void *_parameters)
 			return true;
 		}
 	} else if(!strcmp(rgx, "@ARGUMENTS")) {
-		/* status = sscanf(str, "%255s", string[0]); // TODO
-		fflush(stdin);
-
-		if(status == 1) {
-            addParameters(parameters, string[0], NULL);
-			return true;
-		} */
-
-		addParameters(_parameters, str, NULL);
+		parseArguments(_parameters, str);
 		return true;
 	} else if(!strcmp(rgx, "@OPERATOR")) {
 		if(!strcmp(str, "=") || !strcmp(str, "<>")) {

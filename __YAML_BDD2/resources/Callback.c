@@ -63,12 +63,7 @@ void dropDatabaseFunc(char *s, void *_parameters)
 void createTableFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
-    int i;
-
-	printf("[%s]\n", s);
-	for(i = 0; i < parameters->size; i++) {
-		printf("[%s]\n", parameters->data[i]);
-	}
+    // do something
 }
 
 void dropTableFunc(char *s, void *_parameters)
