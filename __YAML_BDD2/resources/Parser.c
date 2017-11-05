@@ -27,6 +27,12 @@ Parser parserInit()
     return parser;
 };
 
+/// <summary>
+    /// Initialise à zéro l'arbre généré pour le parsing des commandes.
+/// </summary>
+/// <param name="data">donnée pour le noeud</param>
+/// <param name="type">type de la donnée (root, node or regex)</param>
+/// <returns>arbre généré pour le parsing des commandes</returns>
 Node *initNode(char *data, char *type)
 {
 	Node *seed = malloc(sizeof(Node));
@@ -40,6 +46,12 @@ Node *initNode(char *data, char *type)
 	return seed;
 }
 
+/// <summary>
+    /// Génère un arbre à partir de commandes déjà existantes.
+/// </summary>
+/// <param name="s">commande</param>
+/// <param name="tree">arbre</param>
+/// <param name="callback">fonction de callback a appelé dans le cas où la commande émise dans la fonction <see cref="search">search</see> est reconnue</param>
 void build(char *s, Node **tree, void (*callback)(char *, void *))
 {
 	Token *token = _split(s);
@@ -79,6 +91,11 @@ void build(char *s, Node **tree, void (*callback)(char *, void *))
 	}
 }
 
+/// <summary>
+    /// Recherche d'une correspondance entre la commande rentrée et l'arbre généré pour le parsing des commandes.
+/// </summary>
+/// <param name="s">source</param>
+/// <param name="tree">arbre</param>
 void search(char *s, Node **tree)
 {
 	Token *token = _split(s);
@@ -128,6 +145,11 @@ void search(char *s, Node **tree)
 	}
 }
 
+/// <summary>
+    /// Affichage graphique de l'arbre généré pour le parsing des commandes.
+/// </summary>
+/// <param name="seed">arbre</param>
+/// <param name="depth">profondeur</param>
 void statistic(Node *seed, int depth)
 {
 	int i, j;
@@ -157,6 +179,10 @@ void statistic(Node *seed, int depth)
 	}
 }
 
+/// <summary>
+    /// Libère la mémoire de l'arbre généré pour le parsing des commandes.
+/// </summary>
+/// <param name="seed">arbre</param>
 void freeTree(Node *seed)
 {
 	int i;
@@ -170,6 +196,11 @@ void freeTree(Node *seed)
 	}
 }
 
+/// <summary>
+    /// Séparation d'une chaine de caractères en structure de Token à partir de l'espace, d'un guillemet, d'une virgule ou d'un égale.
+/// </summary>
+/// <param name="_parameters">pointeur vers la structure Token</param>
+/// <param name="buffer">source</param>
 void parseArguments(void *_parameters, char *buffer)
 {
     char *buf = malloc(sizeof(char) * (strlen(buffer) + 1));
@@ -207,7 +238,7 @@ void parseArguments(void *_parameters, char *buffer)
             case IN_STRING:
             case IN_WORD:
                 if ((state == IN_STRING && (c == '"' || c == ',' || c == '='))
-                    || (state == IN_WORD && (isspace(c) || c == ',' || c == ','))) {
+                    || (state == IN_WORD && (isspace(c) || c == ',' || c == '='))) {
                     *p = 0;
 
                     allocArguments(_parameters, start_of_word);
@@ -226,6 +257,11 @@ void parseArguments(void *_parameters, char *buffer)
     free(buf);
 }
 
+/// <summary>
+    /// Séparation d'une chaine de caractères en structure de Token à partir de l'espace, d'un guillemet ou d'une parenthèse.
+/// </summary>
+/// <param name="buffer">source</param>
+/// <returns>structure Token avec chaque sous-chaînes</returns>
 Token *_split(char *buffer)
 {
     Token *token = malloc(sizeof(Token));
@@ -340,6 +376,14 @@ void allocArguments(void *_parameters, char *value)
     }
 }
 
+/// <summary>
+    /// Ajout dynamique de paramètres vers la structure Token.
+/// </summary>
+/// <param name="_parameters">pointeur vers la structure Token</param>
+/// <param name="...">liste de paramètres à ajouter</param>
+/// <remarks>
+    /// <paramrefs name="..." /> doit finir par NULL.
+/// </remarks>
 void addParameters(void *_parameters, ...)
 {
     Token *parameters = (Token *)_parameters;
@@ -363,6 +407,13 @@ void addParameters(void *_parameters, ...)
 	va_end(args);
 }
 
+/// <summary>
+    /// Interprétation de pseudo-classes d'expressions régulières.
+/// </summary>
+/// <param name="rgx">pseudo classe de caractères</param>
+/// <param name="str">source</param>
+/// <param name="_parameters">pointeur vers la structure Token</param>
+/// <returns>status de la fonction (0 or 1)</returns>
 int regexp(char *rgx, char *str, void *_parameters)
 {
 	char string[2][256];
