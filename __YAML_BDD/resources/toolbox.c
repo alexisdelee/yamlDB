@@ -136,3 +136,34 @@ Path pathParse(char *tableName, char *dbName)
 
     return path;
 }
+
+unsigned int _typeOf(char *data)
+{
+    double _real;
+    char _trash[256];
+    unsigned int status = YAML_STRING;
+
+    if(sscanf(data, "%lf%255s", &_real, _trash) == 1) {
+        status |= YAML_REAL;
+        if((int)_real == _real) {
+            status |= YAML_INTEGER;
+        }
+    }
+
+    if(strlen(data) == 1) {
+        status |= YAML_CHARACTER;
+    }
+
+    return status;
+}
+
+int _isTypeOf(char *data, int type)
+{
+    unsigned int status = _typeOf(data);
+
+    if(status & type) {
+        return true;
+    } else {
+        return false;
+    }
+}

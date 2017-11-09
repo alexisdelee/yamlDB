@@ -13,6 +13,11 @@
 #define ROOT "container"
 #define EXTNAME ".yaml"
 
+#define YAML_INTEGER    1
+#define YAML_REAL       2
+#define YAML_CHARACTER  4
+#define YAML_STRING     8
+
 typedef struct Path Path;
 struct Path
 {
@@ -30,5 +35,7 @@ char* uniqueIdentifier(char *); // empty string for timestamp as seed
 int _polyfillMkdir(char *);
 int _polyfillRmdir(char *);
 Path pathParse(char *, char *);
+unsigned int _typeOf(char *);
+int _isTypeOf(char *, int);
 
 #endif // TOOLBOX_H_INCLUDED

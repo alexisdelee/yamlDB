@@ -6,19 +6,23 @@
 
 #include "toolbox.h"
 #include "colorShell.h"
+#include "Entity.h"
 #include "yaml.h"
 
 void yamlDatabaseCreate(char *);
 void yamlDatabaseDrop(char *);
-void yamlTableCreate(char *, char *);
+void yamlTableLoad(char *, char *, void *);
+void yamlTableCreate(char *, char *, void *);
+void yamlTableInsert(char *, char *, void *);
 void yamlTableDrop(char *, char *);
-// void yamlTableInsert(char *, char *);
 
 Table tableInit()
 {
     Table table;
 
+    table.load = yamlTableLoad;
     table.create = yamlTableCreate;
+    table.insert = yamlTableInsert;
     table.drop = yamlTableDrop;
 
     return table;
@@ -111,10 +115,30 @@ int _isTable(char *tableName)
     return false;
 }
 
-void yamlTableCreate(char *dbName, char *tableName)
+void yamlTableLoad(char *dbName, char *tableName, void *_entity)
 {
     Path path = pathParse(tableName, dbName);
     FILE *tableFile = NULL;
+    Entity *entity = (Entity *)_entity;
+
+    if(_isDatabase(path.dir) == false) {
+        danger(false, "Exception: a database with this name does not exist\n");
+        return;
+    }
+
+    if(_isTable(path.path) == false) {
+        danger(false, "Exception: a table with this name does not exist\n");
+        return;
+    }
+
+    loadYaml(_entity, path.path);
+}
+
+void yamlTableCreate(char *dbName, char *tableName, void *_entity)
+{
+    Path path = pathParse(tableName, dbName);
+    FILE *tableFile = NULL;
+    Entity *entity = (Entity *)_entity;
 
     if(_isDatabase(path.dir) == false) {
         danger(false, "Exception: a database with this name does not exist\n");
@@ -126,15 +150,20 @@ void yamlTableCreate(char *dbName, char *tableName)
         return;
     }
 
-    tableFile = fopen(path.path, "w");
-    if(tableFile) {
-        fclose(tableFile);
-    } else {
-        danger(false, "Exception: unknown error\n");
-        return;
-    }
+    entity->_.commit(path.path, entity->header, NULL);
 
     success("Table \"%s\" was created\n", tableName);
+}
+
+void yamlTableInsert(char *dbName, char *tableName, void *_entity)
+{
+    Path path = pathParse(tableName, dbName);
+    FILE *tableFile = NULL;
+    Entity *entity = (Entity *)_entity;
+
+    entity->_.commit(path.path, NULL, entity->core[entity->length - 1]);
+
+    success("New line was added in the table \"%s\"\n", tableName);
 }
 
 void yamlTableDrop(char *dbName, char *tableName)
@@ -158,54 +187,3 @@ void yamlTableDrop(char *dbName, char *tableName)
 
     success("Table \"%s\" was deleted\n", tableName);
 }
-
-/* void yamlTableInsert(char *databaseName, char *tableName)
-{
-    FILE *dbFile = NULL;
-    const char *basename = "container";
-    char *path = malloc(sizeof(char) * (strlen(basename) + 1 + 4 + 1 + 4 + strlen(EXTNAME) + 1)); // basename + / + database + / + uniqueidentifiant + extname
-    char *dbIdentifiant;
-    char *tableIdentifiant;
-
-    if(path == NULL) {
-        return;
-    } else {
-        dbIdentifiant = malloc(sizeof(char) * 5);
-        tableIdentifiant = malloc(sizeof(char) * 5);
-
-        if(dbIdentifiant == NULL || tableIdentifiant == NULL) {
-            _safeFree(&path);
-            _safeFree(&dbIdentifiant);
-            _safeFree(&tableIdentifiant);
-
-            return;
-        } else {
-            dbIdentifiant = uniqueIdentifier(databaseName);
-            tableIdentifiant = uniqueIdentifier(tableName);
-
-            sprintf(path, "%s/%s", basename, dbIdentifiant);
-        }
-
-        if(!_isDatabase(path)) {
-            danger(false, "Exception: a database with this name does not exist\n");
-
-            _safeFree(&path);
-            _safeFree(&dbIdentifiant);
-            _safeFree(&tableIdentifiant);
-
-            return;
-        } else {
-            sprintf(path, "%s/%s%s", path, tableIdentifiant, EXTNAME);
-        }
-
-        if(!_isTable(path)) {
-            yamlTableCreate(path);
-        }
-    }
-
-    success("Table \"%s\" was created\n", tableName);
-
-    _safeFree(&path);
-    _safeFree(&dbIdentifiant);
-    _safeFree(&tableIdentifiant);
-} */

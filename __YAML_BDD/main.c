@@ -6,6 +6,7 @@
 #include "resources/yaml.h"
 #include "resources/colorShell.h"
 #include "resources/interface.h"
+#include "resources/Entity.h"
 
 int ansiSupport = false;
 
@@ -13,93 +14,8 @@ void displayResult();
 void displayFunc(char *, int);
 void displayFuncTable(char *, int);
 
-typedef struct Data Data;
-struct Data
-{
-    char key[256];
-    void *value;
-    int dataType;
-};
-
-int yamlTableInsert(int size, Data *data, char *tableName)
-{
-    FILE *tableFile = NULL;
-    char type[520];
-    int i;
-
-    tableFile = fopen(tableName, "a");
-    if(tableFile == NULL) {
-        return false;
-    }
-
-    for(i = 0; i < size; i++) {
-        switch(data[i].dataType) {
-            case 1:
-                sprintf(type, "%s: [%d, \"%d\"]", data[i].key, data[i].dataType, *((int *)data[i].value));
-                break;
-            case 2:
-                sprintf(type, "%s: [%d, \"%lf\"]", data[i].key, data[i].dataType, *((double *)data[i].value));
-                break;
-            case 4:
-                sprintf(type, "%s: [%d, \"%c\"]", data[i].key, data[i].dataType, *((char *)data[i].value));
-                break;
-            case 8:
-                sprintf(type, "%s: [%d, \"%s\"]", data[i].key, data[i].dataType, *((char **)data[i].value));
-                break;
-            default:
-                return false;
-        }
-
-        fprintf(tableFile, "%s\n", type);
-    }
-
-    return true;
-}
-
 int main(int argc, char **argv)
 {
-    // debug
-    /* const char *a = "name: [4, \"toto\"]";
-    char key[256];
-    char value[256];
-    int dataType;
-
-    int s = sscanf(a, "%[^:]: [%d, \"%[^\"]]", key, &dataType, value);
-
-    if(s == 3) {
-        printf("[%s][%s][%d]", key, value, dataType);
-    }
-
-    Data *data = malloc(sizeof(Data));
-    sprintf(data.key, "%d\n", key); */
-
-    /* int size = 3;
-    Path path = pathParse("table", "database");
-    Data *data = malloc(sizeof(Data) * size);
-
-    double b = 3.14;
-    char *c = "toto";
-    char d = 'T';
-
-    sprintf(data[0].key, "%s", "average");
-    data[0].value = &b;
-    data[0].dataType = 2;
-
-    sprintf(data[1].key, "%s", "name");
-    data[1].value = &c;
-    data[1].dataType = 8;
-
-    sprintf(data[2].key, "%s", "initialLetter");
-    data[2].value = &d;
-    data[2].dataType = 4;
-
-    int _status = yamlTableInsert(size, data, path.path);
-    printf("status: %d [%s]\n", _status, path.path);
-    free(data);
-
-    return 0; */
-    // debug
-
     int status = true;
     int startIndex = true;
 
@@ -122,7 +38,7 @@ int main(int argc, char **argv)
     printf("    |__/   |__/  |__/|__/     |__/|________/      |_______/ |_______/ \n\n");
 
     do {
-        status = interface.prompt(startIndex, displayFunc, &interface.options, "Create a database", "Drop a database", "Add a table", "Insert a line in table", "Delete a line in table", "Drop a table", NULL);
+        status = interface.prompt(startIndex, displayFunc, &interface.options, "Create a database", "Drop a database", "Add a table", "Insert a line in table", "Update a line in a table", "Delete a line in table", "Drop a table", NULL);
         startIndex = false;
     } while(status);
 
@@ -170,27 +86,28 @@ void displayFunc(char *value, int index)
     char *table = NULL;
     int status = true;
     int startIndex = true;
+    Entity *entity;
 
     switch(index) {
-        case 0:
+        case 0: // "Quit"
             success("\nClosing the database shell console...\n");
             return;
-        case 1:
+        case 1: // "Create a database"
             database = interface.input("database> ");
             yaml.database.create(database);
 
             break;
-        case 2:
+        case 2: // "Drop a database"
             database = interface.input("database> ");
             yaml.database.drop(database);
 
             break;
-        case 3:
-            /* database = interface.input("database> ");
+        case 3: // "Add a table"
+            database = interface.input("database> ");
             table = interface.input("table> ");
-            yaml.table.create(database, table); */
+            // yaml.table.create(database, table);
 
-            _interface = interfaceInit();
+            /* _interface = interfaceInit();
             _interface.options.quit = true;
             _safeStrdup(&_interface.options.quitLabel, "Save prototype");
 
@@ -200,13 +117,37 @@ void displayFunc(char *value, int index)
             do {
                 status = _interface.prompt(startIndex, displayFuncTable, &_interface.options, "Integer", "Real", "Char", "String", NULL);
                 startIndex = false;
-            } while(status);
+            } while(status); */
+
+            entity = EntityInit();
+
+            entity->_.initializer(entity, YAML_REAL, "age");
+            entity->_.initializer(entity, YAML_STRING, "username");
+
+            yaml.table.create(database, table, entity);
+            freeEntity(entity);
 
             break;
-        case 4:
-        case 5:
+        case 4: // "Insert a line in table"
+            database = interface.input("database> ");
+            table = interface.input("table> ");
+
+            entity = EntityInit();
+
+            yaml.table.load(database, table, entity);
+
+            entity->core = entity->_.newStack(entity);
+            entity->_.push(entity, "19");
+            entity->_.push(entity, "bricetoutpuissant@gmail.com");
+
+            yaml.table.insert(database, table, entity);
+            freeEntity(entity);
+
             break;
-        case 6:
+        case 5: // "Update a line in table"
+        case 6: // "Delete a line in table"
+            break;
+        case 7: // "Drop a table"
             database = interface.input("database> ");
             table = interface.input("table> ");
             yaml.table.drop(database, table);

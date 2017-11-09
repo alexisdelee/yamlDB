@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 	parser.sql("update esgi.test set name = toto where id = ec9f", &tree);
 
 	freeTree(tree);
-	// free /* double free or corruption */
+	// free(tree); /* double free or corruption */
 
 	return 0;
 }
