@@ -19,7 +19,7 @@ typedef struct
 {
     Core **(*newStack)();
     int (*initializer)(void *, unsigned char, char *);
-    int (*push)(void *, char *);
+    int (*push)(void *, char *, char *);
     void (*commit)(char *, Header *, Core *);
 } Method;
 

@@ -137,15 +137,25 @@ void displayFunc(char *value, int index)
             yaml.table.load(database, table, entity);
 
             entity->core = entity->_.newStack(entity);
-            entity->_.push(entity, "19");
-            entity->_.push(entity, "bricetoutpuissant@gmail.com");
+            entity->_.push(entity, "19", NULL);
+            entity->_.push(entity, "bricetoutpuissant@gmail.com", NULL);
 
             yaml.table.insert(database, table, entity);
             freeEntity(entity);
 
             break;
         case 5: // "Update a line in table"
+            break;
         case 6: // "Delete a line in table"
+            database = interface.input("database> ");
+            table = interface.input("table> ");
+
+            entity = EntityInit();
+
+            yaml.table.load(database, table, entity);
+
+            freeEntity(entity);
+
             break;
         case 7: // "Drop a table"
             database = interface.input("database> ");

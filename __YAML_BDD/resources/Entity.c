@@ -10,7 +10,7 @@ Header *newHeader();
 Core **newCore();
 Method MethodInit();
 int pushHeader(void *, unsigned char, char *);
-int pushCore(void *, char *);
+int pushCore(void *, char *, char *);
 void parseYaml(Entity *, char *, int, int, char *);
 void loadYaml(void *, char *);
 void commitEntity(char *, Header *, Core *);
@@ -117,10 +117,10 @@ int pushHeader(void *_entity, unsigned char type, char *data)
     return true;
 }
 
-int pushCore(void *_entity, char *data)
+int pushCore(void *_entity, char *data, char *id)
 {
     Entity *entity = (Entity *)_entity;
-    char *id = uniqueIdentifier("");
+    char *generateId = uniqueIdentifier("");
 
     if(entity->core[entity->length - 1]->size + 1 > entity->header->size) {
         danger(false, "Exception: overflow\n");
@@ -136,14 +136,19 @@ int pushCore(void *_entity, char *data)
     if(entity->core[entity->length - 1]->data == NULL) {
         danger(true, "Exception: error with malloc\n");
     } else {
-        sprintf(entity->core[entity->length - 1]->id, "%s", id);
+        if(id == NULL) {
+            sprintf(entity->core[entity->length - 1]->id, "%s", generateId);
+        } else {
+            sprintf(entity->core[entity->length - 1]->id, "%.4s", id);
+        }
+
         entity->core[entity->length - 1]->data[entity->core[entity->length - 1]->size - 1] = strdup(data);
         if(entity->core[entity->length - 1]->data[entity->core[entity->length - 1]->size - 1] == NULL) {
             danger(true, "Exception: error with malloc\n");
         }
     }
 
-    _safeFree(&id);
+    _safeFree(&generateId);
     return true;
 }
 
@@ -173,7 +178,7 @@ void parseYaml(Entity *entity, char *data, int start, int end, char *status)
             }
 
             sprintf(_data, "%.*s", strlen(_data) - 2, _data + 1);
-            entity->_.push(entity, _data);
+            entity->_.push(entity, _data, data);
         }
 
         _data = strtok(NULL, ",");

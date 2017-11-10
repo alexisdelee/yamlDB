@@ -118,8 +118,6 @@ int _isTable(char *tableName)
 void yamlTableLoad(char *dbName, char *tableName, void *_entity)
 {
     Path path = pathParse(tableName, dbName);
-    FILE *tableFile = NULL;
-    Entity *entity = (Entity *)_entity;
 
     if(_isDatabase(path.dir) == false) {
         danger(false, "Exception: a database with this name does not exist\n");
@@ -137,7 +135,6 @@ void yamlTableLoad(char *dbName, char *tableName, void *_entity)
 void yamlTableCreate(char *dbName, char *tableName, void *_entity)
 {
     Path path = pathParse(tableName, dbName);
-    FILE *tableFile = NULL;
     Entity *entity = (Entity *)_entity;
 
     if(_isDatabase(path.dir) == false) {
@@ -158,7 +155,6 @@ void yamlTableCreate(char *dbName, char *tableName, void *_entity)
 void yamlTableInsert(char *dbName, char *tableName, void *_entity)
 {
     Path path = pathParse(tableName, dbName);
-    FILE *tableFile = NULL;
     Entity *entity = (Entity *)_entity;
 
     entity->_.commit(path.path, NULL, entity->core[entity->length - 1]);

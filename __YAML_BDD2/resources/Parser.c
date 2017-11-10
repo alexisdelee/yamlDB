@@ -28,11 +28,11 @@ Parser parserInit()
 };
 
 /// <summary>
-    /// Initialise à zéro l'arbre généré pour le parsing des commandes.
+    /// Initialise a zero l'arbre genere pour le parsing des commandes.
 /// </summary>
-/// <param name="data">donnée pour le noeud</param>
-/// <param name="type">type de la donnée (root, node or regex)</param>
-/// <returns>arbre généré pour le parsing des commandes</returns>
+/// <param name="data">donnee pour le noeud</param>
+/// <param name="type">type de la donnee (root, node or regex)</param>
+/// <returns>arbre genere pour le parsing des commandes</returns>
 Node *initNode(char *data, char *type)
 {
 	Node *seed = malloc(sizeof(Node));
@@ -47,11 +47,11 @@ Node *initNode(char *data, char *type)
 }
 
 /// <summary>
-    /// Génère un arbre à partir de commandes déjà existantes.
+    /// Genere un arbre a partir de commandes deja existantes.
 /// </summary>
 /// <param name="s">commande</param>
 /// <param name="tree">arbre</param>
-/// <param name="callback">fonction de callback a appelé dans le cas où la commande émise dans la fonction <see cref="search">search</see> est reconnue</param>
+/// <param name="callback">fonction de callback a appele dans le cas ou la commande emise dans la fonction <see cref="search">search</see> est reconnue</param>
 void build(char *s, Node **tree, void (*callback)(char *, void *))
 {
 	Token *token = _split(s);
@@ -92,7 +92,7 @@ void build(char *s, Node **tree, void (*callback)(char *, void *))
 }
 
 /// <summary>
-    /// Recherche d'une correspondance entre la commande rentrée et l'arbre généré pour le parsing des commandes.
+    /// Recherche d'une correspondance entre la commande rentree et l'arbre genere pour le parsing des commandes.
 /// </summary>
 /// <param name="s">source</param>
 /// <param name="tree">arbre</param>
@@ -146,7 +146,7 @@ void search(char *s, Node **tree)
 }
 
 /// <summary>
-    /// Affichage graphique de l'arbre généré pour le parsing des commandes.
+    /// Affichage graphique de l'arbre genere pour le parsing des commandes.
 /// </summary>
 /// <param name="seed">arbre</param>
 /// <param name="depth">profondeur</param>
@@ -180,7 +180,7 @@ void statistic(Node *seed, int depth)
 }
 
 /// <summary>
-    /// Libère la mémoire de l'arbre généré pour le parsing des commandes.
+    /// Libere la memoire de l'arbre genere pour le parsing des commandes.
 /// </summary>
 /// <param name="seed">arbre</param>
 void freeTree(Node *seed)
@@ -197,7 +197,7 @@ void freeTree(Node *seed)
 }
 
 /// <summary>
-    /// Séparation d'une chaine de caractères en structure de Token à partir de l'espace, d'un guillemet, d'une virgule ou d'un égale.
+    /// Separation d'une chaine de caracteres en structure de Token a partir de l'espace, d'un guillemet, d'une virgule ou d'un egale.
 /// </summary>
 /// <param name="_parameters">pointeur vers la structure Token</param>
 /// <param name="buffer">source</param>
@@ -258,10 +258,10 @@ void parseArguments(void *_parameters, char *buffer)
 }
 
 /// <summary>
-    /// Séparation d'une chaine de caractères en structure de Token à partir de l'espace, d'un guillemet ou d'une parenthèse.
+    /// Separation d'une chaine de caracteres en structure de Token a partir de l'espace, d'un guillemet ou d'une parenthese.
 /// </summary>
 /// <param name="buffer">source</param>
-/// <returns>structure Token avec chaque sous-chaînes</returns>
+/// <returns>structure Token avec chaque sous-chaines</returns>
 Token *_split(char *buffer)
 {
     Token *token = malloc(sizeof(Token));
@@ -377,10 +377,10 @@ void allocArguments(void *_parameters, char *value)
 }
 
 /// <summary>
-    /// Ajout dynamique de paramètres vers la structure Token.
+    /// Ajout dynamique de parametres vers la structure Token.
 /// </summary>
 /// <param name="_parameters">pointeur vers la structure Token</param>
-/// <param name="...">liste de paramètres à ajouter</param>
+/// <param name="...">liste de parametres a ajouter</param>
 /// <remarks>
     /// <paramrefs name="..." /> doit finir par NULL.
 /// </remarks>
@@ -408,9 +408,9 @@ void addParameters(void *_parameters, ...)
 }
 
 /// <summary>
-    /// Interprétation de pseudo-classes d'expressions régulières.
+    /// Interpretation de pseudo-classes d'expressions regulieres.
 /// </summary>
-/// <param name="rgx">pseudo classe de caractères</param>
+/// <param name="rgx">pseudo classe de caracteres</param>
 /// <param name="str">source</param>
 /// <param name="_parameters">pointeur vers la structure Token</param>
 /// <returns>status de la fonction (0 or 1)</returns>
