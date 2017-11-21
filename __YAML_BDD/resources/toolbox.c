@@ -168,3 +168,16 @@ int _isTypeOf(char *data, int type)
         return false;
     }
 }
+
+int contains(char *value, char **values, int size)
+{
+    int i;
+
+    for(i = 0; i < size; i++) {
+        if(!strcmp(value, values[i])) {
+            return i;
+        }
+    }
+
+    return -1;
+}

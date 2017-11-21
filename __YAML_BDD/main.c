@@ -10,10 +10,8 @@
 
 int ansiSupport = false;
 
-void displayResult();
 void displayFunc(char *, int);
 void displayFuncTable(char *, int);
-void selectCallback(void *, void *);
 
 int main(int argc, char **argv)
 {
@@ -46,47 +44,17 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void displayResult()
-{
-    char data[3][3][50] = {
-        { "@id", "Key", "Value" },
-        { "eb8a", "_hello", "Hello world" },
-        { "f0dc", "_holla", "Holla ?" }
-    };
-
-    int maxLengthCoord[3] = { 1, 1, 1 };
-
-    int sizeRows = 3, sizeColumns = 3;
-    int i, j;
-
-    printf(" ------ -------- -------------\n");
-
-    for(i = 0; i < sizeRows; i++) {
-        for(j = 0; j < sizeColumns; j++) {
-            if(!j) {
-                printf("| ");
-            }
-
-            printf("%*s | ", strlen(data[maxLengthCoord[j]][j]), data[i][j]);
-        }
-
-        printf("\n ------ -------- -------------\n");
-
-        if(!i) {
-            printf(" ------ -------- -------------\n");
-        }
-    }
-}
-
 void displayFunc(char *value, int index)
 {
     Interface interface = interfaceInit();
     Interface _interface;
     Yaml yaml = yamlInit();
+    Stack *stack;
     char *database = NULL;
     char *table = NULL;
     int status = true;
     int startIndex = true;
+    int i, j, id;
     Entity *entity;
 
     switch(index) {
@@ -124,6 +92,7 @@ void displayFunc(char *value, int index)
 
             entity->_.initializer(entity, YAML_REAL, "age");
             entity->_.initializer(entity, YAML_STRING, "username");
+            entity->_.initializer(entity, YAML_CHARACTER, "capitalize");
 
             yaml.table.create(database, table, entity);
             freeEntity(entity);
@@ -134,32 +103,76 @@ void displayFunc(char *value, int index)
             table = interface.input("table> ");
 
             entity = entityInit();
-            yaml.table.load(database, table, entity);
+            if(yaml.table.load(database, table, entity)) {
+                entity->core = entity->_.newStack(entity);
 
-            entity->core = entity->_.newStack(entity);
-            entity->_.push(entity, "19", NULL);
-            entity->_.push(entity, "bricetoutpuissant@gmail.com", NULL);
+                entity->_.push(entity, "19", NULL);
+                entity->_.push(entity, "bricetoutpuissant@gmail.com", NULL);
+                entity->_.push(entity, "B", NULL);
 
-            yaml.table.insert(database, table, entity);
+                yaml.table.insert(database, table, entity);
+            }
+
             freeEntity(entity);
 
             break;
         case 5: // "Select lines in a table"
             entity = entityInit();
 
-            yaml.table.load("esgi", "test", entity);
-            // yaml.table.select("esgi", "test", entity, selectCallback, ">=", "age", "19", "username", "age", NULL);
-            yaml.table.select("esgi", "test", entity, selectCallback, "<>", "username", "bricetoutpuissant@gmail.com", "age", NULL);
+            if(yaml.table.load("esgi", "test", entity)) {
+                stack = yaml.table.select("esgi", "test", entity, "=", "username", "bricetoutpuissant@gmail.com", "*", NULL);
+
+                if(stack) {
+                    for(i = 0; i < stack->size; i++) {
+                        if(stack->indexed[i].active == NULL) {
+                            for(j = 0; j < stack->indexed[i].size; j++) {
+                                id = stack->indexed[i].ids[j];
+                                if(!j) {
+                                    printf("id:%s => { ", entity->core[i]->id);
+                                }
+
+                                if(!(entity->header->type[j] & YAML_UNDEFINED)) {
+                                    printf("\n%2svalue: \"%s\", type: \"%s\"", "", entity->core[i]->data[id], entity->header->type[id] & YAML_INTEGER ? "integer" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "string")));
+                                }
+
+                                if(j == stack->indexed[i].size - 1) {
+                                    printf("\n}\n");
+                                }
+                            }
+                        }
+                    }
+
+                    destroyStack(stack);
+                }
+            }
 
             freeEntity(entity);
 
             break;
         case 6: // "Update a line in a table"
+            entity = entityInit();
+
+            if(yaml.table.load("esgi", "test", entity)) {
+                yaml.table.update("esgi", "test", entity, "username", "toto", ">=", "age", "20");
+            }
+
+            freeEntity(entity);
+
+            break;
         case 7: // "Delete a line in table"
+            entity = entityInit();
+
+            if(yaml.table.load("esgi", "test", entity)) {
+                yaml.table.delete("esgi", "test", entity, ">=", "age", "20");
+            }
+
+            freeEntity(entity);
+
             break;
         case 8: // "Drop a table"
             database = interface.input("database> ");
             table = interface.input("table> ");
+
             yaml.table.drop(database, table);
 
             break;
@@ -167,32 +180,6 @@ void displayFunc(char *value, int index)
 
     _safeFree(&database);
     _safeFree(&table);
-}
-
-void selectCallback(void *_entity, void *_stack)
-{
-    Entity *entity = (Entity *)_entity;
-    Stack *stack = (Stack *)_stack;
-    int i, j, id;
-
-    for(i = 0; i < stack->size; i++) {
-        if(stack->indexed[i].active == NULL) {
-            for(j = 0; j < stack->indexed[i].size; j++) {
-                id = stack->indexed[i].ids[j];
-                if(!j) {
-                    printf("id:%s => { ", entity->core[i]->id);
-                }
-
-                if(!(entity->header->type[j] & YAML_UNDEFINED)) {
-                    printf("\n%2svalue: \"%s\", type: \"%s\"", "", entity->core[i]->data[id], entity->header->type[id] & YAML_INTEGER ? "integer" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "string")));
-                }
-
-                if(j == stack->indexed[i].size - 1) {
-                    printf("\n}\n");
-                }
-            }
-        }
-    }
 }
 
 void displayFuncTable(char *value, int index)

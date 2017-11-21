@@ -13,11 +13,13 @@
 
 void yamlDatabaseCreate(char *);
 void yamlDatabaseDrop(char *);
-void yamlTableLoad(char *, char *, void *);
+int yamlTableLoad(char *, char *, void *);
 void yamlTableCreate(char *, char *, void *);
 void yamlTableInsert(char *, char *, void *);
+Stack *yamlTableSelect(char *, char *, void *, char *, char *, char *, ...);
+void yamlTableUpdate(char *, char *, void *, char *, char *, char *, char *, char *);
+void yamlTableDelete(char *, char *, void *, char *, char *, char *);
 void yamlTableDrop(char *, char *);
-void yamlTableSelect(char *, char *, void *, void (*callback)(void *, void *), char *, char *, char *, ...);
 Stack *launcher();
 void move(Stack *, int);
 void push(Stack *, int);
@@ -32,6 +34,8 @@ Table tableInit()
     table.create = yamlTableCreate;
     table.insert = yamlTableInsert;
     table.select = yamlTableSelect;
+    table.update = yamlTableUpdate;
+    table.delete = yamlTableDelete;
     table.drop = yamlTableDrop;
 
     return table;
@@ -124,22 +128,23 @@ int _isTable(char *tableName)
     return false;
 }
 
-void yamlTableLoad(char *dbName, char *tableName, void *_entity)
+int yamlTableLoad(char *dbName, char *tableName, void *_entity)
 {
     Entity *entity = (Entity *)_entity;
     Path path = pathParse(tableName, dbName);
 
     if(_isDatabase(path.dir) == false) {
         danger(false, "Exception: a database with this name does not exist\n");
-        return;
+        return false;
     }
 
     if(_isTable(path.path) == false) {
         danger(false, "Exception: a table with this name does not exist\n");
-        return;
+        return false;
     }
 
     entity->_.load(_entity, path.path);
+    return true;
 }
 
 void yamlTableCreate(char *dbName, char *tableName, void *_entity)
@@ -172,7 +177,7 @@ void yamlTableInsert(char *dbName, char *tableName, void *_entity)
     success("New line was added in the table \"%s\"\n", tableName);
 }
 
-void yamlTableSelect(char *dbName, char *tableName, void *_entity, void (*callback)(void *, void *), char *operator, char *valueA, char *valueB, ...)
+Stack *yamlTableSelect(char *dbName, char *tableName, void *_entity, char *operator, char *valueA, char *valueB, ...)
 {
     Entity *entity = (Entity *)_entity;
     Engine engine = engineInit();
@@ -180,48 +185,101 @@ void yamlTableSelect(char *dbName, char *tableName, void *_entity, void (*callba
     va_list args;
     char *choice = NULL;
     int i, j, k;
+    int allStatement = 0;
 
-    for(j = 0; j < entity->header->size; j++) {
-        if(!strcmp(valueA, entity->header->data[j])) {
-            break;
-        } else if(j == entity->header->size - 1) {
-            danger(false, "Exception: the \"%s\" column does not exist in this table\n", valueA);
-            return;
-        }
+    if((j = contains(valueA, entity->header->data, entity->header->size)) == -1) {
+        danger(false, "Exception: the \"%s\" column does not exist in this table\n", valueA);
+        return NULL;
     }
 
     va_start(args, valueB);
 
     while((choice = va_arg(args, char *))) {
-        for(i = 0; i < entity->header->size; i++) {
-            if(!strcmp(choice, entity->header->data[i])) {
-                // debug
-                for(k = 0; k < entity->length; k++) {
+        if(allStatement || !strcmp(choice, "*")) {
+            allStatement = 1;
+
+            for(k = 0; k < entity->length; k++) {
+                for(i = 0; i < entity->core[k]->size; i++) {
                     if(engine.eval(operator, entity->core[k]->data[j], valueB, entity->header->type[j])) {
                         move(stack, k);
                         push(stack, i);
                     }
                 }
-                // debug
+            }
+        } else if((i = contains(choice, entity->header->data, entity->header->size)) == -1) {
+            danger(false, "Exception: the \"%s\" column does not exist in this table\n", choice);
 
-                break;
-            } else if(i == entity->header->size - 1) {
-                danger(false, "Exception: the \"%s\" column does not exist in this table\n", choice);
-
-                va_end(args);
-                destroyStack(stack);
-                return;
+            va_end(args);
+            destroyStack(stack);
+            return NULL;
+        } else {
+            for(k = 0; k < entity->length; k++) {
+                if(engine.eval(operator, entity->core[k]->data[j], valueB, entity->header->type[j])) {
+                    move(stack, k);
+                    push(stack, i);
+                }
             }
         }
     }
 
     va_end(args);
 
-    if(callback) {
-        callback(entity, stack);
+    return stack;
+}
+
+void yamlTableUpdate(char *dbName, char *tableName, void *_entity, char *valueA, char *valueB, char *operator, char *valueC, char *valueD)
+{
+    Path path = pathParse(tableName, dbName);
+    Entity *entity = (Entity *)_entity;
+    Stack *stack;
+    int i, j;
+
+    if((i = contains(valueA, entity->header->data, entity->header->size)) == -1) {
+        danger(false, "Exception: the \"%s\" column does not exist in this table\n", valueA);
+        return;
     }
 
-    destroyStack(stack);
+    stack = yamlTableSelect(dbName, tableName, entity, operator, valueC, valueD, valueA, NULL);
+
+    if(stack) {
+        for(i = 0; i < stack->size; i++) {
+            if(stack->indexed[i].active == NULL) {
+                for(j = 0; j < stack->indexed[i].size; j++) {
+                    entity->_.set(entity, i, stack->indexed[i].ids[j], valueB);
+                    success("Line #%s was updated in the table \"%s\"\n", entity->core[i]->id, tableName);
+                }
+            }
+        }
+
+        entity->_.reload(entity, path.path);
+        destroyStack(stack);
+    } else {
+        danger(false, "Exception: unknown error\n");
+    }
+}
+
+void yamlTableDelete(char *dbName, char *tableName, void *_entity, char *operator, char *valueA, char *valueB)
+{
+    Path path = pathParse(tableName, dbName);
+    Entity *entity = (Entity *)_entity;
+    Stack *stack;
+    int i;
+
+    stack = yamlTableSelect(dbName, tableName, entity, operator, valueA, valueB, "*", NULL);
+
+    if(stack) {
+        for(i = 0; i < stack->size; i++) {
+            if(stack->indexed[i].active == NULL && stack->indexed[i].size) {
+                entity->_.remove(entity, i);
+                success("Line #%s was deleted in the table \"%s\"\n", entity->core[i]->id, tableName);
+            }
+        }
+
+        entity->_.reload(entity, path.path);
+        destroyStack(stack);
+    } else {
+        danger(false, "Exception: unknown error\n");
+    }
 }
 
 // debug
@@ -230,8 +288,7 @@ Stack *launcher()
     Stack *stack = malloc(sizeof(Stack));
 
     if(stack == NULL) {
-        perror("Memory exception\n");
-        exit(-1);
+        danger(true, "Exception: error with malloc\n");
     }
 
     stack->currentPointer = 0;
@@ -263,8 +320,7 @@ void push(Stack *stack, int id)
     }
 
     if( stack->indexed[_current].ids == NULL) {
-        perror("Memory exception\n");
-        exit(-1);
+        danger(true, "Exception: error with malloc\n");
     }
 
     stack->indexed[_current].ids[stack->indexed[_current].size - 1] = id;
@@ -281,8 +337,7 @@ void __realloc(Stack *stack, int size)
     }
 
     if(stack->indexed == NULL) {
-        perror("Memory exception\n");
-        exit(-1);
+        danger(true, "Exception: error with malloc\n");
     }
 
     stack->indexed[stack->size - 1].active = NULL;

@@ -303,7 +303,9 @@ void rewriteYaml(void *_entity, char *tablePath)
     commitEntity(tablePath, entity->header, NULL);
 
     for(i = 0; i < entity->length; i++) {
-        commitEntity(tablePath, NULL, entity->core[i]);
+        if(entity->core[i]->status != 'D') {
+            commitEntity(tablePath, NULL, entity->core[i]);
+        }
     }
 }
 
@@ -312,17 +314,17 @@ void setCore(void *_entity, int line, int col, char *data)
     Entity *entity = (Entity *)_entity;
 
     if(line >= 0 && line < entity->length) {
-        if(col >= 0 && col < entity->core[entity->length - 1]->size) {
-            if(entity->core[entity->length - 1]->data[col] != NULL) {
-                free(entity->core[entity->length - 1]->data[col]);
+        if(col >= 0 && col < entity->core[line]->size) {
+            if(entity->core[line]->data[col] != NULL) {
+                free(entity->core[line]->data[col]);
             }
 
-            entity->core[entity->length - 1]->data[col] = strdup(data);
-            if(entity->core[entity->length - 1]->data[col] == NULL) {
+            entity->core[line]->data[col] = strdup(data);
+            if(entity->core[line]->data[col] == NULL) {
                 danger(true, "Exception: error with malloc\n");
             }
 
-            entity->core[entity->length - 1]->status = 'M';
+            entity->core[line]->status = 'M';
         }
     }
 }
@@ -330,24 +332,9 @@ void setCore(void *_entity, int line, int col, char *data)
 void removeCore(void *_entity, int line)
 {
     Entity *entity = (Entity *)_entity;
-    int i, j;
 
     if(line >= 0 && line < entity->length) {
-        for(i = 0; i < entity->length; i++) {
-            if(i == line) {
-                for(j = 0; j < entity->core[i]->size; j++) {
-                    _safeFree(&entity->core[i]->data[j]);
-                }
-
-                if(entity->core[i]->data != NULL) free(entity->core[i]->data);
-                if(entity->core[i] != NULL) free(entity->core[i]);
-            } else if(i > line) {
-                entity->core[i - 1] = entity->core[i];
-            }
-        }
-
-        entity->core[entity->length - 1] = NULL;
-        entity->length--;
+        entity->core[line]->status = 'D';
     }
 }
 

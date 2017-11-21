@@ -1,6 +1,7 @@
 proto:
-  - data: ["age","username"]
-  - types: [2,8]
+  - data: ["age","username","capitalize"]
+  - types: [2,8,4]
 
-b7e7: ["19","bricetoutpuissant@gmail.com"]
-67e6: ["20","floralimpalaer@gmail.com"]
+b7e7: ["19","bricetoutpuissant@gmail.com","B"]
+67e6: ["20","floralimpalaer@gmail.com","F"]
+e9c0: ["21","alexisdelee@gmail.com","A"]

@@ -23,10 +23,12 @@ typedef struct
 
 typedef struct Table
 {
-    void (*load)(char *, char *, void *);
+    int (*load)(char *, char *, void *);
     void (*create)(char *, char *, void *);
     void (*insert)(char *, char *, void *);
-    void (*select)(char *, char *, void *, void (*callback)(void *, void *), char *, char *, char *, ...);
+    Stack *(*select)(char *, char *, void *, char *, char *, char *, ...);
+    void (*update)(char *, char *, void *, char *, char *, char *, char *, char *);
+    void (*delete)(char *, char *, void *, char *, char *, char *);
     void (*drop)(char *, char *);
 } Table;
 
