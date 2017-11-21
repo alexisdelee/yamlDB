@@ -17,6 +17,7 @@
 #define YAML_REAL       2
 #define YAML_CHARACTER  4
 #define YAML_STRING     8
+#define YAML_UNDEFINED  16
 
 typedef struct Path Path;
 struct Path

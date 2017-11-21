@@ -4,6 +4,7 @@
 
 #include "toolbox.h"
 #include "colorShell.h"
+#include "Engine.h"
 #include "Entity.h"
 
 Header *newHeader();
@@ -14,6 +15,9 @@ int pushCore(void *, char *, char *);
 void parseYaml(Entity *, char *, int, int, char *);
 void loadYaml(void *, char *);
 void commitEntity(char *, Header *, Core *);
+void rewriteYaml(void *, char *);
+void setCore(void *, int, int, char *);
+void removeCore(void *_entity, int line);
 
 Method MethodInit()
 {
@@ -23,11 +27,15 @@ Method MethodInit()
     method.initializer = pushHeader;
     method.push = pushCore;
     method.commit = commitEntity;
+    method.load = loadYaml;
+    method.reload = rewriteYaml;
+    method.set = setCore;
+    method.remove = removeCore;
 
     return method;
 }
 
-Entity *EntityInit()
+Entity *entityInit()
 {
     Entity *entity = malloc(sizeof(Entity));
     if(entity == NULL) {
@@ -126,6 +134,7 @@ int pushCore(void *_entity, char *data, char *id)
         danger(false, "Exception: overflow\n");
         return false;
     } else if(!_isTypeOf(data, (int)entity->header->type[entity->core[entity->length - 1]->size])) {
+        printf("[%s|%d]\n", data, (int)entity->header->type[entity->core[entity->length - 1]->size]);
         danger(false, "Exception: this datatype is not expected for this data\n");
         return false;
     }
@@ -146,6 +155,12 @@ int pushCore(void *_entity, char *data, char *id)
         if(entity->core[entity->length - 1]->data[entity->core[entity->length - 1]->size - 1] == NULL) {
             danger(true, "Exception: error with malloc\n");
         }
+
+        if(entity->core[entity->length - 1]->size == entity->header->size) {
+            entity->core[entity->length - 1]->status = 'A'; // added to index
+        } else {
+            entity->core[entity->length - 1]->status = '!'; // ignored
+        }
     }
 
     _safeFree(&generateId);
@@ -156,9 +171,11 @@ void parseYaml(Entity *entity, char *data, int start, int end, char *status)
 {
     int i;
     char *_data = NULL;
-    char *source = malloc(sizeof(char) * (end - start));
+    char *source = malloc(sizeof(char) * (end - start + 1));
     if(source == NULL) {
         danger(true, "Exception: error with malloc\n");
+    } else {
+        source[0] = '\0';
     }
 
     sprintf(source, "%.*s", end - start, data + start);
@@ -179,6 +196,8 @@ void parseYaml(Entity *entity, char *data, int start, int end, char *status)
 
             sprintf(_data, "%.*s", strlen(_data) - 2, _data + 1);
             entity->_.push(entity, _data, data);
+
+            entity->core[entity->length - 1]->status = ' '; // not updated
         }
 
         _data = strtok(NULL, ",");
@@ -274,6 +293,62 @@ void commitEntity(char *tablePath, Header *header, Core *core)
     }
 
     fclose(tableFile);
+}
+
+void rewriteYaml(void *_entity, char *tablePath)
+{
+    Entity *entity = (Entity *)_entity;
+    int i;
+
+    commitEntity(tablePath, entity->header, NULL);
+
+    for(i = 0; i < entity->length; i++) {
+        commitEntity(tablePath, NULL, entity->core[i]);
+    }
+}
+
+void setCore(void *_entity, int line, int col, char *data)
+{
+    Entity *entity = (Entity *)_entity;
+
+    if(line >= 0 && line < entity->length) {
+        if(col >= 0 && col < entity->core[entity->length - 1]->size) {
+            if(entity->core[entity->length - 1]->data[col] != NULL) {
+                free(entity->core[entity->length - 1]->data[col]);
+            }
+
+            entity->core[entity->length - 1]->data[col] = strdup(data);
+            if(entity->core[entity->length - 1]->data[col] == NULL) {
+                danger(true, "Exception: error with malloc\n");
+            }
+
+            entity->core[entity->length - 1]->status = 'M';
+        }
+    }
+}
+
+void removeCore(void *_entity, int line)
+{
+    Entity *entity = (Entity *)_entity;
+    int i, j;
+
+    if(line >= 0 && line < entity->length) {
+        for(i = 0; i < entity->length; i++) {
+            if(i == line) {
+                for(j = 0; j < entity->core[i]->size; j++) {
+                    _safeFree(&entity->core[i]->data[j]);
+                }
+
+                if(entity->core[i]->data != NULL) free(entity->core[i]->data);
+                if(entity->core[i] != NULL) free(entity->core[i]);
+            } else if(i > line) {
+                entity->core[i - 1] = entity->core[i];
+            }
+        }
+
+        entity->core[entity->length - 1] = NULL;
+        entity->length--;
+    }
 }
 
 void freeEntity(Entity *entity)

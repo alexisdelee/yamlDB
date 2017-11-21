@@ -11,6 +11,7 @@ typedef struct
 typedef struct
 {
     int size;
+    char status;
     char id[5];
     char **data;
 } Core;
@@ -21,6 +22,10 @@ typedef struct
     int (*initializer)(void *, unsigned char, char *);
     int (*push)(void *, char *, char *);
     void (*commit)(char *, Header *, Core *);
+    void (*load)(void *, char *);
+    void (*reload)(void *, char *);
+    void (*set)(void *, int, int, char *);
+    void (*remove)(void *, int);
 } Method;
 
 typedef struct
@@ -31,9 +36,8 @@ typedef struct
     Method _;
 } Entity;
 
-Entity *EntityInit();
+Entity *entityInit();
 
-void loadYaml(void *, char *);
 void freeEntity(Entity *);
 
 #endif // ENTITY_H_INCLUDED

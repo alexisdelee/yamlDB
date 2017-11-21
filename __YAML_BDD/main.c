@@ -13,6 +13,7 @@ int ansiSupport = false;
 void displayResult();
 void displayFunc(char *, int);
 void displayFuncTable(char *, int);
+void selectCallback(void *, void *);
 
 int main(int argc, char **argv)
 {
@@ -38,7 +39,7 @@ int main(int argc, char **argv)
     printf("    |__/   |__/  |__/|__/     |__/|________/      |_______/ |_______/ \n\n");
 
     do {
-        status = interface.prompt(startIndex, displayFunc, &interface.options, "Create a database", "Drop a database", "Add a table", "Insert a line in table", "Update a line in a table", "Delete a line in table", "Drop a table", NULL);
+        status = interface.prompt(startIndex, displayFunc, &interface.options, "Create a database", "Drop a database", "Add a table", "Insert a line in a table", "Select lines in a table", "Update a line in a table", "Delete a line in table", "Drop a table", NULL);
         startIndex = false;
     } while(status);
 
@@ -119,7 +120,7 @@ void displayFunc(char *value, int index)
                 startIndex = false;
             } while(status); */
 
-            entity = EntityInit();
+            entity = entityInit();
 
             entity->_.initializer(entity, YAML_REAL, "age");
             entity->_.initializer(entity, YAML_STRING, "username");
@@ -132,8 +133,7 @@ void displayFunc(char *value, int index)
             database = interface.input("database> ");
             table = interface.input("table> ");
 
-            entity = EntityInit();
-
+            entity = entityInit();
             yaml.table.load(database, table, entity);
 
             entity->core = entity->_.newStack(entity);
@@ -144,20 +144,20 @@ void displayFunc(char *value, int index)
             freeEntity(entity);
 
             break;
-        case 5: // "Update a line in table"
-            break;
-        case 6: // "Delete a line in table"
-            database = interface.input("database> ");
-            table = interface.input("table> ");
+        case 5: // "Select lines in a table"
+            entity = entityInit();
 
-            entity = EntityInit();
-
-            yaml.table.load(database, table, entity);
+            yaml.table.load("esgi", "test", entity);
+            // yaml.table.select("esgi", "test", entity, selectCallback, ">=", "age", "19", "username", "age", NULL);
+            yaml.table.select("esgi", "test", entity, selectCallback, "<>", "username", "bricetoutpuissant@gmail.com", "age", NULL);
 
             freeEntity(entity);
 
             break;
-        case 7: // "Drop a table"
+        case 6: // "Update a line in a table"
+        case 7: // "Delete a line in table"
+            break;
+        case 8: // "Drop a table"
             database = interface.input("database> ");
             table = interface.input("table> ");
             yaml.table.drop(database, table);
@@ -167,6 +167,32 @@ void displayFunc(char *value, int index)
 
     _safeFree(&database);
     _safeFree(&table);
+}
+
+void selectCallback(void *_entity, void *_stack)
+{
+    Entity *entity = (Entity *)_entity;
+    Stack *stack = (Stack *)_stack;
+    int i, j, id;
+
+    for(i = 0; i < stack->size; i++) {
+        if(stack->indexed[i].active == NULL) {
+            for(j = 0; j < stack->indexed[i].size; j++) {
+                id = stack->indexed[i].ids[j];
+                if(!j) {
+                    printf("id:%s => { ", entity->core[i]->id);
+                }
+
+                if(!(entity->header->type[j] & YAML_UNDEFINED)) {
+                    printf("\n%2svalue: \"%s\", type: \"%s\"", "", entity->core[i]->data[id], entity->header->type[id] & YAML_INTEGER ? "integer" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "string")));
+                }
+
+                if(j == stack->indexed[i].size - 1) {
+                    printf("\n}\n");
+                }
+            }
+        }
+    }
 }
 
 void displayFuncTable(char *value, int index)

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 #include "toolbox.h"
 #include "colorShell.h"
@@ -141,7 +142,7 @@ unsigned int _typeOf(char *data)
 {
     double _real;
     char _trash[256];
-    unsigned int status = YAML_STRING;
+    unsigned int status = YAML_STRING | YAML_UNDEFINED;
 
     if(sscanf(data, "%lf%255s", &_real, _trash) == 1) {
         status |= YAML_REAL;

@@ -1,0 +1,147 @@
+# depslib dependency file v1.0
+1508678747 source:c:\wamp\www\projets\__yaml_bdd\resources\manager.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"toolbox.h"
+	"manager.h"
+
+1508678752 c:\wamp\www\projets\__yaml_bdd\resources\manager.h
+
+1509309246 source:c:\wamp\www\projets\__yaml_bdd\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"resources/toolbox.h"
+	"resources/yaml.h"
+	"resources/colorShell.h"
+	"resources/interface.h"
+
+1509308846 c:\wamp\www\projets\__yaml_bdd\resources\toolbox.h
+
+1509309290 source:c:\wamp\www\projets\__yaml_bdd\resources\toolbox.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"toolbox.h"
+	"colorShell.h"
+
+1509308420 c:\wamp\www\projets\__yaml_bdd\resources\interface.h
+
+1509309947 source:c:\wamp\www\projets\__yaml_bdd\resources\interface.c
+	<stdio.h>
+	<stdlib.h>
+	<stdarg.h>
+	<string.h>
+	<limits.h>
+	<errno.h>
+	<math.h>
+	"toolbox.h"
+	"colorShell.h"
+	"interface.h"
+
+1508788389 source:c:\wamp\www\projets\__yaml_bdd\resources\colorshell.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdarg.h>
+	"colorShell.h"
+
+1508786479 c:\wamp\www\projets\__yaml_bdd\resources\colorshell.h
+
+1508965925 source:c:\wamp\www\projets\__yaml_bdd\resources\yaml.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<errno.h>
+	<dirent.h>
+	"toolbox.h"
+	"colorShell.h"
+	"yaml.h"
+
+1508965903 c:\wamp\www\projets\__yaml_bdd\resources\yaml.h
+
+1509310759 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\colorshell.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdarg.h>
+	"colorShell.h"
+
+1508786479 c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\colorshell.h
+
+1509310777 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\interface.c
+	<stdio.h>
+	<stdlib.h>
+	<stdarg.h>
+	<string.h>
+	<limits.h>
+	<errno.h>
+	<math.h>
+	"toolbox.h"
+	"colorShell.h"
+	"interface.h"
+
+1510783847 c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\toolbox.h
+
+1509308420 c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\interface.h
+
+1510783844 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\toolbox.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<math.h>
+	"toolbox.h"
+	"colorShell.h"
+
+1511289918 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\yaml.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<errno.h>
+	<dirent.h>
+	<stdarg.h>
+	"toolbox.h"
+	"colorShell.h"
+	"Entity.h"
+	"Engine.h"
+	"yaml.h"
+
+1511289851 c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\yaml.h
+
+1511289381 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"resources/toolbox.h"
+	"resources/yaml.h"
+	"resources/colorShell.h"
+	"resources/interface.h"
+	"resources/Entity.h"
+
+1510607571 c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\entity.h
+
+1510866961 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\entity.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"toolbox.h"
+	"colorShell.h"
+	"Engine.h"
+	"Entity.h"
+
+1510776337 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\engine.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<errno.h>
+	<math.h>
+	"toolbox.h"
+	"colorShell.h"
+	"Engine.h"
+
+1510608244 c:\wamp\www\projets\__yaml_bdd\__yaml_bdd\resources\engine.h
+

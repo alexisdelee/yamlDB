@@ -1,0 +1,41 @@
+# depslib dependency file v1.0
+1509485046 source:c:\wamp\www\lab\2017\311017\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+
+1509575328 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd2\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"resources/arguments.h"
+	"resources/Parser.h"
+	"resources/Callback.h"
+
+1509575320 c:\wamp\www\projets\__yaml_bdd\__yaml_bdd2\resources\parser.h
+
+1509575957 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd2\resources\parser.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<stdarg.h>
+	"Parser.h"
+
+1509567831 c:\wamp\www\projets\__yaml_bdd\__yaml_bdd2\resources\arguments.h
+
+1509575262 c:\wamp\www\projets\__yaml_bdd\__yaml_bdd2\resources\callback.h
+
+1509567814 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd2\resources\arguments.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"arguments.h"
+
+1509575442 source:c:\wamp\www\projets\__yaml_bdd\__yaml_bdd2\resources\callback.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"Callback.h"
+
