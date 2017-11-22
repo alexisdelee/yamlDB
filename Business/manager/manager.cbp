@@ -2,12 +2,12 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Audit" />
+		<Option title="manager" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/Audit" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/manager" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -16,7 +16,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/Audit" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/manager" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -31,41 +31,37 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../Business/Callback.h" />
-		<Unit filename="../Business/Parser.h" />
-		<Unit filename="../Business/arguments.h" />
-		<Unit filename="../Common/Interface.c">
+		<Unit filename="../../Common/Interface.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../Common/Interface.h" />
-		<Unit filename="../Common/colorShell.c">
+		<Unit filename="../../Common/Interface.h" />
+		<Unit filename="../../Common/colorShell.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../Common/colorShell.h" />
-		<Unit filename="../Common/toolbox.c">
+		<Unit filename="../../Common/colorShell.h" />
+		<Unit filename="../../Common/toolbox.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../Common/toolbox.h" />
-		<Unit filename="../Database/Engine.c">
+		<Unit filename="../../Common/toolbox.h" />
+		<Unit filename="../Callback.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../Database/Engine.h" />
-		<Unit filename="../Database/Entity.c">
+		<Unit filename="../Callback.h" />
+		<Unit filename="../Parser.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../Database/Entity.h" />
-		<Unit filename="../Database/Yaml.c">
+		<Unit filename="../Parser.h" />
+		<Unit filename="../arguments.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../Database/Yaml.h" />
-		<Unit filename="Global.TU.c">
+		<Unit filename="../arguments.h" />
+		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />
 			<debugger />
-			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
