@@ -19,6 +19,12 @@
 #define YAML_STRING     8
 #define YAML_UNDEFINED  16
 
+typedef struct
+{
+	char **data;
+	int size;
+} Token;
+
 typedef struct Path Path;
 struct Path
 {

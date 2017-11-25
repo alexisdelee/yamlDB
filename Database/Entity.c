@@ -285,17 +285,23 @@ int commitEntity(char *tablePath, Header *header, Core *core)
             fprintf(tableFile, "]\n");
         }
     } else if(core != NULL) {
-        fprintf(tableFile, "\n%s: [", core->id);
+        if(core->status != 'D' && core->status != '!') {
+            fprintf(tableFile, "\n%s: [", core->id);
 
-        for(i = 0; i < core->size; i++) {
-            fprintf(tableFile, "\"%s\"%s", core->data[i], i == core->size - 1 ? "" : ",");
+            for(i = 0; i < core->size; i++) {
+                fprintf(tableFile, "\"%s\"%s", core->data[i], i == core->size - 1 ? "" : ",");
+            }
+
+            fprintf(tableFile, "]");
+            fclose(tableFile);
+            return true;
+        } else {
+            fclose(tableFile);
+            return false;
         }
-
-        fprintf(tableFile, "]");
     }
 
-    fclose(tableFile);
-	return true;
+    return true;
 }
 
 void rewriteYaml(void *_entity, char *tablePath)
@@ -306,9 +312,7 @@ void rewriteYaml(void *_entity, char *tablePath)
     commitEntity(tablePath, entity->header, NULL);
 
     for(i = 0; i < entity->length; i++) {
-        if(entity->core[i]->status != 'D') {
-            commitEntity(tablePath, NULL, entity->core[i]);
-        }
+        commitEntity(tablePath, NULL, entity->core[i]);
     }
 }
 
