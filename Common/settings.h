@@ -6,8 +6,8 @@ typedef struct
     char environment[256];
     int allowColor;
     int tree;
-} Config;
+} Settings;
 
-Config settings(int, char **);
+Settings getSettings(int, char **);
 
 #endif // GLOBAL_H_INCLUDED

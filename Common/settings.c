@@ -7,21 +7,21 @@
 #include "global.h"
 
 void _settingsParse(Config *, char *, char *);
-Config defaultSettings();
+Settings defaultSettings();
 
-Config settings(int argc, char **argv)
+Settings getSettings(int argc, char **argv)
 {
     FILE *conf = NULL;
-    Config config = defaultSettings();
+    Settings settings = defaultSettings();
     char line[1001];
     int size;
 
     if(argc < 2) {
         fclose(conf);
-        danger(false, true, "YAML_BDD <config path>\n");
+        danger(true, "YAML_BDD <config path>\n");
     } else {
         if((conf = fopen(argv[1], "r")) == false) {
-            danger(false, true, "Exception: non-existent configuration file\n");
+            danger(true, "Exception: non-existent configuration file\n");
         }
     }
 
@@ -31,25 +31,25 @@ Config settings(int argc, char **argv)
             line[size - 1] = '\0';
         }
 
-        _settingsParse(&config, line, "environment");
+        _settingsParse(&settings, line, "environment");
     }
 
     fclose(conf);
-    return config;
+    return settings;
 }
 
-Config defaultSettings()
+Settings defaultSettings()
 {
-    Config config;
+    Settings settings;
 
-    strcpy(config.environment, "");
-    config.allowColor = false;
-    config.tree = false;
+    strcpy(settings.environment, "");
+    settings.allowColor = false;
+    settings.tree = false;
 
-    return config;
+    return settings;
 }
 
-void _settingsParse(Config *config, char *data, char *key)
+void _settingsParse(Settings *settings, char *data, char *key)
 {
     char _key[256];
     char _value[256];
@@ -63,10 +63,10 @@ void _settingsParse(Config *config, char *data, char *key)
     sprintf(_value, "%s", data + index + 1);
 
     if(!strcmp(_key, "environment")) {
-        sprintf(config->environment, "%s", _value);
+        sprintf(settings->environment, "%s", _value);
     } else if(!strcmp(_key, "allow-color") && !strcmp(_value, "true")) {
-        config->allowColor = true;
+        settings->allowColor = true;
     } else if(!strcmp(_key, "tree") && !strcmp(_value, "true")) {
-        config->tree = true;
+        settings->tree = true;
     }
 }
