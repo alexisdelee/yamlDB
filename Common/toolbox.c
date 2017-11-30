@@ -7,6 +7,8 @@
 #include "toolbox.h"
 #include "colorShell.h"
 
+char *env();
+
 void _safeFree(char **string)
 {
     if(string != NULL) {
@@ -106,6 +108,19 @@ int _polyfillRmdir(char *databaseName)
     return !status ? true : false;
 }
 
+char *env()
+{
+    char *homedir = NULL;
+    static char yamldir[256];
+
+    if((homedir = getenv("~")) == NULL && (homedir = getenv("HOMEPATH")) == NULL) {
+        danger(true, "Exception: the environment variable ~ or HOMEPATH is not configure\n");
+    }
+
+    sprintf(yamldir, "%s\\.yaml", homedir);
+    return yamldir;
+}
+
 Path pathParse(char *tableName, char *dbName)
 {
     Path path;
@@ -119,18 +134,18 @@ Path pathParse(char *tableName, char *dbName)
         sprintf(path.name, "%s", "");
     }
 
-    sprintf(path.root, "%s", ROOT);
-    sprintf(path.ext, "%s", EXTNAME);
+    sprintf(path.root, "%s", env());
+    strcpy(path.ext, ".yaml");
     sprintf(path.base, "%s%s", path.name, path.ext);
 
     if(dbName) {
         dbIdentifiant = uniqueIdentifier(dbName);
-        sprintf(path.dir, "%s/%s", path.root, dbIdentifiant);
+        sprintf(path.dir, "%s\\%s", path.root, dbIdentifiant);
     } else {
         sprintf(path.dir, "%s", path.root);
     }
 
-    sprintf(path.path, "%s/%s", path.dir, path.base);
+    sprintf(path.path, "%s\\%s", path.dir, path.base);
 
     _safeFree(&tableIdentifiant);
     _safeFree(&dbIdentifiant);

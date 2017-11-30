@@ -11,8 +11,8 @@
 #include "../../Common/throw.h"
 #include "../../Common/settings.h"
 
-int ansiSupport = false;
-Settings settings;
+int ansiSupport; // color mode
+int debug; // debug mode
 
 void displayFunc(char *, int);
 void displayFuncTable(char *, int);
@@ -25,16 +25,9 @@ int main(int argc, char **argv)
     Interface interface = interfaceInit();
     interface.options.quit = true;
 
-    if(argc >= 2 && !strcmp(argv[1], "--color-mode")) {
-        ansiSupport = true;
-    }
-
-    // debug
-    settings = getSettings();
-
-    // Throw *err = setError("test");
-    // printStackError(err, settings.debug);
-    // debug
+    Settings settings = getSettings();
+    ansiSupport = settings.allowColor;
+    debug = settings.debug;
 
     welcome("Starting the database shell console...\n\n");
 
@@ -76,13 +69,13 @@ void displayFunc(char *value, int index)
         case 1: // "Create a database"
             database = interface.input("database> ");
             err = (Throw *)yaml.database.create(database);
-            printStackError(err, settings.debug);
+            printStackError(err, debug);
 
             break;
         case 2: // "Drop a database"
             database = interface.input("database> ");
             err = (Throw *)yaml.database.drop(database);
-            printStackError(err, settings.debug);
+            printStackError(err, debug);
 
             break;
         case 3: // "Add a table"
@@ -109,7 +102,7 @@ void displayFunc(char *value, int index)
             entity->_.initializer(entity, YAML_CHARACTER, "capitalize");
 
             err = (Throw *)yaml.table.create(database, table, entity);
-            printStackError(err, settings.debug);
+            printStackError(err, debug);
             freeEntity(entity);
 
             break;
@@ -120,7 +113,7 @@ void displayFunc(char *value, int index)
             entity = entityInit();
             err = (Throw *)yaml.table.load(database, table, entity);
             if(err->err) {
-                printStackError(err, settings.debug);
+                printStackError(err, debug);
             } else {
                 entity->core = entity->_.newStack(entity);
 
@@ -130,7 +123,7 @@ void displayFunc(char *value, int index)
 
                 free(err);
                 err = yaml.table.insert(database, table, entity);
-                printStackError(err, settings.debug);
+                printStackError(err, debug);
             }
 
             freeEntity(entity);
@@ -143,12 +136,12 @@ void displayFunc(char *value, int index)
             entity = entityInit();
             err = (Throw *)yaml.table.load(database, table, entity);
             if(err->err) {
-                printStackError(err, settings.debug);
+                printStackError(err, debug);
             } else {
                 err = (Throw *)yaml.table.select(database, table, entity, (void **)(&stack), "<>", "age", "20", "*", NULL);
 
                 if(err->err) {
-                    printStackError(err, settings.debug);
+                    printStackError(err, debug);
                 } else {
                     for(i = 0; i < stack->size; i++) {
                         if(stack->indexed[i].active == NULL) {
@@ -183,13 +176,13 @@ void displayFunc(char *value, int index)
             entity = entityInit();
             err = (Throw *)yaml.table.load(database, table, entity);
             if(err->err) {
-                printStackError(err, settings.debug);
+                printStackError(err, debug);
             } else {
                 free(err);
 
                 err = yaml.table.update(database, table, entity, "username", "toto", ">=", "age", "20");
                 if(err->err) {
-                    printStackError(err, settings.debug);
+                    printStackError(err, debug);
                 }
             }
 
@@ -209,7 +202,7 @@ void displayFunc(char *value, int index)
 
                 err = yaml.table.delete(database, table, entity, ">=", "age", "20");
                 if(err->err) {
-                    printStackError(err, settings.debug);
+                    printStackError(err, debug);
                 }
             }
 
@@ -221,7 +214,7 @@ void displayFunc(char *value, int index)
             table = interface.input("table> ");
 
             err = (Throw *)yaml.table.drop(database, table);
-            printStackError(err, settings.debug);
+            printStackError(err, debug);
 
             break;
     }

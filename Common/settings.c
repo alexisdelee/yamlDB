@@ -37,7 +37,6 @@ Settings defaultSettings()
 {
     Settings settings;
 
-    strcpy(settings.environment, "");
     settings.allowColor = false;
     settings.tree = false;
     settings.debug = false;
@@ -58,9 +57,7 @@ void _settingsParse(Settings *settings, char *data)
     sprintf(_key, "%.*s", index, data);
     sprintf(_value, "%s", data + index + 1);
 
-    if(!strcmp(_key, "environment")) {
-        sprintf(settings->environment, "%s", _value);
-    } else if(!strcmp(_key, "allow-color") && !strcmp(_value, "true")) {
+    if(!strcmp(_key, "allow-color") && !strcmp(_value, "true")) {
         settings->allowColor = true;
     } else if(!strcmp(_key, "tree") && !strcmp(_value, "true")) {
         settings->tree = true;

@@ -12,6 +12,8 @@
 #include "Engine.h"
 #include "Yaml.h"
 
+char environment[256] = "";
+
 void *yamlDatabaseCreate(char *);
 void *yamlDatabaseDrop(char *);
 void *yamlTableLoad(char *, char *, void *);
@@ -25,6 +27,11 @@ Stack *launcher();
 void move(Stack *, int);
 void push(Stack *, int);
 void __realloc(Stack *, int);
+
+void entityGlobalEnv(char *_environment)
+{
+    sprintf(environment, "%s", _environment);
+}
 
 Table tableInit()
 {
@@ -266,11 +273,11 @@ void *yamlTableDelete(char *dbName, char *tableName, void *_entity, char *operat
             if(stack->indexed[i].active == NULL && stack->indexed[i].size) {
                 entity->core[i]->status = 'D';
                 success("Line #%s was deleted in the table \"%s\"\n", entity->core[i]->id, tableName);
+
+                entity->_.reload(entity, path.path);
+                entity->_.remove(entity, i);
             }
         }
-
-        entity->_.reload(entity, path.path);
-        entity->_.remove(entity, i);
 
         destroyStack(stack);
     } else {

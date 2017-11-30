@@ -10,9 +10,6 @@
     #define OS_Windows true
 #endif
 
-#define ROOT "container"
-#define EXTNAME ".yaml"
-
 #define YAML_INTEGER    1
 #define YAML_REAL       2
 #define YAML_CHARACTER  4

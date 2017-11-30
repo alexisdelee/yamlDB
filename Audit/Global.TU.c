@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "../Common/toolbox.h"
+#include "../Common/throw.h"
 #include "../Common/colorShell.h"
 #include "../Business/arguments.h"
 #include "../Database/Yaml.h"
@@ -18,8 +19,11 @@ typedef struct
 
 int ansiSupport = false;
 
+void secureSet(Throw **, Throw *);
+
 int main(int argc, char **argv)
 {
+    Throw *err = NULL;
 	Test test = {yamlInit(), NULL, NULL};
     int activeField = false;
 
@@ -35,11 +39,13 @@ int main(int argc, char **argv)
 	if(activeField == false || !strcmp("--database", argv[1])) {
 	    printf("Database TU:\n");
 		// "Create a database"
-		assert(test.yaml.database.create("Test") == true);
+		secureSet(&err, test.yaml.database.create("Test"));
+		assert(err->err == false);
 		welcome("%2s[ok] Create a database\n", "");
 
 		// "Create an other database with the same name"
-		assert(test.yaml.database.create("Test") == false);
+		secureSet(&err, test.yaml.database.create("Test"));
+		assert(err->err == true);
 		welcome("%2s[ok] Create an other database with the same name\n", "");
 
 		// "Add a table"
@@ -49,11 +55,13 @@ int main(int argc, char **argv)
 		test.entity->_.initializer(test.entity, YAML_STRING, "username");
 		test.entity->_.initializer(test.entity, YAML_CHARACTER, "capitalize");
 
-		assert(test.yaml.table.create("Test", "test", test.entity) == true);
+        secureSet(&err, test.yaml.table.create("Test", "test", test.entity));
+		assert(err->err == false);
 		welcome("%2s[ok] Create a table\n", "");
 
 		// "Add an other table with the same name"
-		assert(test.yaml.table.create("Test", "test", test.entity) == false);
+		secureSet(&err, test.yaml.table.create("Test", "test", test.entity));
+		assert(err->err == true);
 		welcome("%2s[ok] Create an other table with the same name\n", "");
 
 		freeEntity(test.entity);
@@ -61,16 +69,16 @@ int main(int argc, char **argv)
 		// "Insert a line in a table"
 		test.entity = entityInit();
 
-		if(test.yaml.table.load("Test", "test", test.entity)) {
+		secureSet(&err, test.yaml.table.load("Test", "test", test.entity));
+		if(err->err == false) {
 			// test.entity->core = test.entity->_.newStack(test.entity);
 
 			test.entity->_.push(test.entity, "666", NULL);
 			test.entity->_.push(test.entity, "lucy@gmail.com", NULL);
 			test.entity->_.push(test.entity, "L", NULL);
 
-			test.yaml.table.insert("Test", "test", test.entity);
-
-			assert(test.entity->length == 1 && test.entity->core[0]->size == 3);
+			secureSet(&err, test.yaml.table.insert("Test", "test", test.entity));
+			assert(err->err == false && test.entity->length == 1 && test.entity->core[0]->size == 3);
 			welcome("%2s[ok] Insert a line in a table\n", "");
 		}
 
@@ -79,19 +87,16 @@ int main(int argc, char **argv)
 		// "Select a line in a table"
 		test.entity = entityInit();
 
-		if(test.yaml.table.load("Test", "test", test.entity)) {
-			test.stack = test.yaml.table.select("Test", "test", test.entity, "=", "username", "lucy@gmail.com", "*", NULL);
-			assert(test.stack);
-
-			assert(test.stack->size == 1 && test.stack->indexed[0].active == NULL && test.stack->indexed[0].size == 3);
+		secureSet(&err, test.yaml.table.load("Test", "test", test.entity));
+		if(err->err == false) {
+			secureSet(&err, test.yaml.table.select("Test", "test", test.entity, (void **)(&test.stack), "=", "username", "lucy@gmail.com", "*", NULL));
+			assert(err->err == false && test.stack->size == 1 && test.stack->indexed[0].active == NULL && test.stack->indexed[0].size == 3);
 			welcome("%2s[ok] Select a line with all properties in a table\n", "");
 
 			destroyStack(test.stack);
 
-			test.stack = test.yaml.table.select("Test", "test", test.entity, "=", "username", "lucy@gmail.com", "username", "capitalize", NULL);
-			assert(test.stack);
-
-			assert(test.stack->size == 1 && test.stack->indexed[0].active == NULL && test.stack->indexed[0].size == 2);
+			secureSet(&err, test.yaml.table.select("Test", "test", test.entity, (void **)(&test.stack), "=", "username", "lucy@gmail.com", "username", "capitalize", NULL));
+			assert(err->err == false && test.stack->size == 1 && test.stack->indexed[0].active == NULL && test.stack->indexed[0].size == 2);
 			welcome("%2s[ok] Select a line with \"username\" and \"capitalize\" properties in a table\n", "");
 
 			destroyStack(test.stack);
@@ -102,9 +107,10 @@ int main(int argc, char **argv)
 		// "Update a line in a table"
 		test.entity = entityInit();
 
-		if(test.yaml.table.load("Test", "test", test.entity)) {
-			assert(test.yaml.table.update("Test", "test", test.entity, "username", "satan@gmail.com", ">=", "age", "666") == true);
-			assert(strcmp("satan@gmail.com", test.entity->core[0]->data[1]) == 0);
+		secureSet(&err, test.yaml.table.load("Test", "test", test.entity));
+		if(err->err == false) {
+            secureSet(&err, test.yaml.table.update("Test", "test", test.entity, "username", "satan@gmail.com", ">=", "age", "666"));
+			assert(err->err == false && strcmp("satan@gmail.com", test.entity->core[0]->data[1]) == 0);
 			welcome("%2s[ok] Update a line in a table\n", "");
 		}
 
@@ -113,21 +119,26 @@ int main(int argc, char **argv)
 		// "Delete a line in table"
 		test.entity = entityInit();
 
-		if(test.yaml.table.load("Test", "test", test.entity)) {
-			assert(test.yaml.table.delete("Test", "test", test.entity, "=", "username", "satan@gmail.com") == true);
-			assert(test.entity->length == 0);
+		secureSet(&err, test.yaml.table.load("Test", "test", test.entity));
+		if(err->err == false) {
+            secureSet(&err, test.yaml.table.delete("Test", "test", test.entity, "=", "username", "satan@gmail.com"));
+			assert(err->err == false && test.entity->length == 0);
 			welcome("%2s[ok] Delete a line in a table\n", "");
 		}
 
 		freeEntity(test.entity);
 
 		// "Drop a table"
-		assert(test.yaml.table.drop("Test", "test") == true);
+		secureSet(&err, test.yaml.table.drop("Test", "test"));
+		assert(err->err == false);
 		welcome("%2s[ok] Drop a table\n", "");
 
 		// "Drop a database"
-		assert(test.yaml.database.drop("Test") == true);
+		secureSet(&err, test.yaml.database.drop("Test"));
+		assert(err->err == false);
 		welcome("%2s[ok] Drop a database\n", "");
+
+		secureSet(&err, NULL);
 	}
 	// endregion
 
@@ -144,4 +155,13 @@ int main(int argc, char **argv)
 	// endregion
 
     return 0;
+}
+
+void secureSet(Throw **err, Throw *result)
+{
+    if(*err != NULL) {
+        free(*err);
+    }
+
+    *err = result;
 }

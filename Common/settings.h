@@ -3,7 +3,6 @@
 
 typedef struct
 {
-    char environment[256];
     int allowColor;
     int tree;
     int debug;
