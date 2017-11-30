@@ -4,25 +4,20 @@
 
 #include "toolbox.h"
 #include "colorShell.h"
-#include "global.h"
+#include "settings.h"
 
-void _settingsParse(Config *, char *, char *);
+void _settingsParse(Settings *, char *);
 Settings defaultSettings();
 
-Settings getSettings(int argc, char **argv)
+Settings getSettings()
 {
     FILE *conf = NULL;
     Settings settings = defaultSettings();
     char line[1001];
     int size;
 
-    if(argc < 2) {
-        fclose(conf);
-        danger(true, "YAML_BDD <config path>\n");
-    } else {
-        if((conf = fopen(argv[1], "r")) == false) {
-            danger(true, "Exception: non-existent configuration file\n");
-        }
+    if((conf = fopen("yaml.conf", "r")) == false) {
+        danger(true, "Exception: non-existent configuration file (yaml.conf)\n");
     }
 
     while(fgets(line, 1001, conf)) {
@@ -31,7 +26,7 @@ Settings getSettings(int argc, char **argv)
             line[size - 1] = '\0';
         }
 
-        _settingsParse(&settings, line, "environment");
+        _settingsParse(&settings, line);
     }
 
     fclose(conf);
@@ -45,11 +40,12 @@ Settings defaultSettings()
     strcpy(settings.environment, "");
     settings.allowColor = false;
     settings.tree = false;
+    settings.debug = false;
 
     return settings;
 }
 
-void _settingsParse(Settings *settings, char *data, char *key)
+void _settingsParse(Settings *settings, char *data)
 {
     char _key[256];
     char _value[256];
@@ -68,5 +64,7 @@ void _settingsParse(Settings *settings, char *data, char *key)
         settings->allowColor = true;
     } else if(!strcmp(_key, "tree") && !strcmp(_value, "true")) {
         settings->tree = true;
+    } else if(!strcmp(_key, "debug") && !strcmp(_value, "true")) {
+        settings->debug = true;
     }
 }

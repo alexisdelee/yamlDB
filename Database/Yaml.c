@@ -6,20 +6,21 @@
 #include <stdarg.h>
 
 #include "../Common/toolbox.h"
+#include "../Common/throw.h"
 #include "../Common/colorShell.h"
 #include "Entity.h"
 #include "Engine.h"
 #include "Yaml.h"
 
-int yamlDatabaseCreate(char *);
-int yamlDatabaseDrop(char *);
-int yamlTableLoad(char *, char *, void *);
-int yamlTableCreate(char *, char *, void *);
-int yamlTableInsert(char *, char *, void *);
-Stack *yamlTableSelect(char *, char *, void *, char *, char *, char *, ...);
-int yamlTableUpdate(char *, char *, void *, char *, char *, char *, char *, char *);
-int yamlTableDelete(char *, char *, void *, char *, char *, char *);
-int yamlTableDrop(char *, char *);
+void *yamlDatabaseCreate(char *);
+void *yamlDatabaseDrop(char *);
+void *yamlTableLoad(char *, char *, void *);
+void *yamlTableCreate(char *, char *, void *);
+void *yamlTableInsert(char *, char *, void *);
+void *yamlTableSelect(char *, char *, void *, void **, char *, char *, char *, ...);
+void *yamlTableUpdate(char *, char *, void *, char *, char *, char *, char *, char *);
+void *yamlTableDelete(char *, char *, void *, char *, char *, char *);
+void *yamlTableDrop(char *, char *);
 Stack *launcher();
 void move(Stack *, int);
 void push(Stack *, int);
@@ -74,44 +75,38 @@ int _isDatabase(char *databaseName)
     return false;
 }
 
-int yamlDatabaseCreate(char *dbName)
+void *yamlDatabaseCreate(char *dbName)
 {
     Path path = pathParse(NULL, dbName);
     int status;
 
     if(_isDatabase(path.dir) == true) {
-        danger(false, "Exception: a database with this name already exists\n");
-        return false;
+        return (void *)setError("Exception: a database with this name already exists");
     }
 
     status = _polyfillMkdir(path.dir);
     if(status == false) {
-        danger(false, "Exception: unknown error\n");
-        return false;
+        return (void *)setError("Exception: unknown error");
     }
 
-    success("Database \"%s\" was created\n", dbName);
-    return true;
+    return (void *)setSuccess("Database \"%s\" was created", dbName);
 }
 
-int yamlDatabaseDrop(char *dbName)
+void *yamlDatabaseDrop(char *dbName)
 {
     Path path = pathParse(NULL, dbName);
     int status;
 
     if(_isDatabase(path.dir) == false) {
-        danger(false, "Exception: a database with this name does not exist\n");
-        return false;
+        return (void*)setError("Exception: a database with this name does not exist");
     }
 
     status = _polyfillRmdir(path.dir);
     if(status == false) {
-        danger(false, "Exception: unknown error\n");
-        return false;
+        return (void *)setError("Exception: unknown error");
     }
 
-    success("Database \"%s\" was deleted\n", dbName);
-    return true;
+    return (void *)setSuccess("Database \"%s\" was deleted", dbName);
 }
 
 // tables: privates methods
@@ -129,73 +124,67 @@ int _isTable(char *tableName)
     return false;
 }
 
-int yamlTableLoad(char *dbName, char *tableName, void *_entity)
+void *yamlTableLoad(char *dbName, char *tableName, void *_entity)
 {
     Entity *entity = (Entity *)_entity;
     Path path = pathParse(tableName, dbName);
 
     if(_isDatabase(path.dir) == false) {
-        danger(false, "Exception: a database with this name does not exist\n");
-        return false;
+        return (void *)setError("Exception: a database with this name does not exist");
     }
 
     if(_isTable(path.path) == false) {
-        danger(false, "Exception: a table with this name does not exist\n");
-        return false;
+        return (void *)setError("Exception: a table with this name does not exist");
     }
 
     return entity->_.load(_entity, path.path);
 }
 
-int yamlTableCreate(char *dbName, char *tableName, void *_entity)
+void *yamlTableCreate(char *dbName, char *tableName, void *_entity)
 {
     Path path = pathParse(tableName, dbName);
     Entity *entity = (Entity *)_entity;
 
     if(_isDatabase(path.dir) == false) {
-        danger(false, "Exception: a database with this name does not exist\n");
-        return false;
+        return (void *)setError("Exception: a database with this name does not exist");
     }
 
     if(_isTable(path.path) == true) {
-        danger(false, "Exception: a table with this name already exists\n");
-        return false;
+        return setError("Exception: a table with this name already exists");
     }
 
     if(!entity->_.commit(path.path, entity->header, NULL)) {
-		return false;
+		return (void *)setError("Exception: unknown error");
 	}
 
-    success("Table \"%s\" was created\n", tableName);
-	return true;
+    return (void *)setSuccess("Table \"%s\" was created", tableName);
 }
 
-int yamlTableInsert(char *dbName, char *tableName, void *_entity)
+void *yamlTableInsert(char *dbName, char *tableName, void *_entity)
 {
     Path path = pathParse(tableName, dbName);
     Entity *entity = (Entity *)_entity;
 
-    if(!entity->_.commit(path.path, NULL, entity->core[entity->length - 1])) {
-        return false;
+    Throw *err = (Throw *)entity->_.commit(path.path, NULL, entity->core[entity->length - 1]);
+    if(err->err) {
+        return (void *)err;
     }
 
-    success("New line was added in the table \"%s\"\n", tableName);
-    return true;
+    return (void *)setSuccess("New line was added in the table \"%s\"", tableName);
 }
 
-Stack *yamlTableSelect(char *dbName, char *tableName, void *_entity, char *operator, char *valueA, char *valueB, ...)
+void *yamlTableSelect(char *dbName, char *tableName, void *_entity, void **_stack, char *operator, char *valueA, char *valueB, ...)
 {
     Entity *entity = (Entity *)_entity;
     Engine engine = engineInit();
-    Stack *stack = launcher();
     va_list args;
+    Stack *stack = launcher();
     char *choice = NULL;
     int i, j, k;
     int allStatement = 0;
 
     if((j = contains(valueA, entity->header->data, entity->header->size)) == -1) {
-        danger(false, "Exception: the \"%s\" column does not exist in this table\n", valueA);
-        return NULL;
+        return (void *)setError("Exception: the \"%s\" column does not exist in this table", valueA);
     }
 
     va_start(args, valueB);
@@ -213,11 +202,9 @@ Stack *yamlTableSelect(char *dbName, char *tableName, void *_entity, char *opera
                 }
             }
         } else if((i = contains(choice, entity->header->data, entity->header->size)) == -1) {
-            danger(false, "Exception: the \"%s\" column does not exist in this table\n", choice);
-
             va_end(args);
             destroyStack(stack);
-            return NULL;
+            return (void *)setError("Exception: the \"%s\" column does not exist in this table", choice);
         } else {
             for(k = 0; k < entity->length; k++) {
                 if(engine.eval(operator, entity->core[k]->data[j], valueB, entity->header->type[j])) {
@@ -228,25 +215,25 @@ Stack *yamlTableSelect(char *dbName, char *tableName, void *_entity, char *opera
         }
     }
 
+    *_stack = (void *)stack;
     va_end(args);
-    return stack;
+    return (void *)setSuccess("");
 }
 
-int yamlTableUpdate(char *dbName, char *tableName, void *_entity, char *valueA, char *valueB, char *operator, char *valueC, char *valueD)
+void *yamlTableUpdate(char *dbName, char *tableName, void *_entity, char *valueA, char *valueB, char *operator, char *valueC, char *valueD)
 {
     Path path = pathParse(tableName, dbName);
     Entity *entity = (Entity *)_entity;
-    Stack *stack;
+    Stack *stack = NULL;
     int i, j;
 
     if((i = contains(valueA, entity->header->data, entity->header->size)) == -1) {
-        danger(false, "Exception: the \"%s\" column does not exist in this table\n", valueA);
-        return false;
+        return (void *)setError("Exception: the \"%s\" column does not exist in this table", valueA);
     }
 
-    stack = yamlTableSelect(dbName, tableName, entity, operator, valueC, valueD, valueA, NULL);
+    Throw *err = (Throw *)yamlTableSelect(dbName, tableName, entity, (void **)(&stack), operator, valueC, valueD, valueA, NULL);
 
-    if(stack) {
+    if(!err->err) {
         for(i = 0; i < stack->size; i++) {
             if(stack->indexed[i].active == NULL) {
                 for(j = 0; j < stack->indexed[i].size; j++) {
@@ -259,42 +246,38 @@ int yamlTableUpdate(char *dbName, char *tableName, void *_entity, char *valueA, 
         entity->_.reload(entity, path.path);
         destroyStack(stack);
     } else {
-        danger(false, "Exception: unknown error\n");
-        return false;
+        return (void *)err;
     }
 
-    return true;
+    return (void *)setSuccess("");
 }
 
-int yamlTableDelete(char *dbName, char *tableName, void *_entity, char *operator, char *valueA, char *valueB)
+void *yamlTableDelete(char *dbName, char *tableName, void *_entity, char *operator, char *valueA, char *valueB)
 {
     Path path = pathParse(tableName, dbName);
     Entity *entity = (Entity *)_entity;
     Stack *stack;
     int i;
 
-    stack = yamlTableSelect(dbName, tableName, entity, operator, valueA, valueB, "*", NULL);
+    Throw *err = (Throw *)yamlTableSelect(dbName, tableName, entity, (void **)(&stack), operator, valueA, valueB, "*", NULL);
 
-    if(stack) {
+    if(!err->err) {
         for(i = 0; i < stack->size; i++) {
             if(stack->indexed[i].active == NULL && stack->indexed[i].size) {
                 entity->core[i]->status = 'D';
                 success("Line #%s was deleted in the table \"%s\"\n", entity->core[i]->id, tableName);
-
-                entity->_.reload(entity, path.path);
-                entity->_.remove(entity, i);
-
-                break;
             }
         }
 
+        entity->_.reload(entity, path.path);
+        entity->_.remove(entity, i);
+
         destroyStack(stack);
     } else {
-        danger(false, "Exception: unknown error\n");
-        return false;
+        return (void *)err;
     }
 
-    return true;
+    return (void *)setSuccess("");
 }
 
 // debug
@@ -375,25 +358,21 @@ void destroyStack(Stack *stack)
 }
 // debug
 
-int yamlTableDrop(char *dbName, char *tableName)
+void *yamlTableDrop(char *dbName, char *tableName)
 {
     Path path = pathParse(tableName, dbName);
 
     if(_isDatabase(path.dir) == false) {
-        danger(false, "Exception: a database with this name does not exist\n");
-        return false;
+        return (void *)setError("Exception: a database with this name does not exist");
     }
 
     if(remove(path.path)) {
         if(errno == ENOENT) {
-            danger(false, "Exception: a table with this name does not exist\n");
+            return (void *)setError("Exception: a table with this name does not exist");
         } else {
-            danger(false, "Exception: unknown error\n");
+            return (void *)setError("Exception: unknown error");
         }
-
-        return false;
     }
 
-    success("Table \"%s\" was deleted\n", tableName);
-    return true;
+    return (void *)setSuccess("Table \"%s\" was deleted", tableName);
 }

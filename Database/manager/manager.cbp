@@ -39,6 +39,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Common/colorShell.h" />
+		<Unit filename="../../Common/settings.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Common/settings.h" />
+		<Unit filename="../../Common/throw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Common/throw.h" />
 		<Unit filename="../../Common/toolbox.c">
 			<Option compilerVar="CC" />
 		</Unit>

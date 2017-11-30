@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../Common/toolbox.h"
+#include "../Common/throw.h"
 #include "../Common/colorShell.h"
 #include "Engine.h"
 #include "Entity.h"
@@ -13,8 +14,8 @@ Method MethodInit();
 int pushHeader(void *, unsigned char, char *);
 int pushCore(void *, char *, char *);
 void parseYaml(Entity *, char *, int, int, char *);
-int loadYaml(void *, char *);
-int commitEntity(char *, Header *, Core *);
+void *loadYaml(void *, char *);
+void *commitEntity(char *, Header *, Core *);
 void rewriteYaml(void *, char *);
 void setCore(void *, int, int, char *);
 void removeCore(void *_entity, int line);
@@ -206,7 +207,7 @@ void parseYaml(Entity *entity, char *data, int start, int end, char *status)
     _safeFree(&source);
 }
 
-int loadYaml(void *_entity, char *tablePath)
+void *loadYaml(void *_entity, char *tablePath)
 {
     Entity *entity = (Entity *)_entity;
     FILE *tableFile = NULL;
@@ -216,8 +217,7 @@ int loadYaml(void *_entity, char *tablePath)
 
     tableFile = fopen(tablePath, "r");
     if(tableFile == NULL) {
-        danger(false, "Exception: unknown error\n");
-		return false;
+        return (void *)setError("Exception: error with table file");
     }
 
     while(fgets(data, 501, tableFile) != NULL) {
@@ -246,18 +246,17 @@ int loadYaml(void *_entity, char *tablePath)
     }
 
     fclose(tableFile);
-	return true;
+	return (void *)setSuccess("");
 }
 
-int commitEntity(char *tablePath, Header *header, Core *core)
+void *commitEntity(char *tablePath, Header *header, Core *core)
 {
     FILE *tableFile = NULL;
     int i, j;
 
     tableFile = fopen(tablePath, header == NULL ? "a" : "w");
     if(tableFile == NULL) {
-        danger(false, "Exception: unknown error\n");
-        return false;
+        return (void *)setError("Exception: error with table file");
     }
 
     if(header != NULL) {
@@ -294,14 +293,12 @@ int commitEntity(char *tablePath, Header *header, Core *core)
 
             fprintf(tableFile, "]");
             fclose(tableFile);
-            return true;
-        } else {
-            fclose(tableFile);
-            return false;
+            return (void *)setSuccess("");
         }
     }
 
-    return true;
+    fclose(tableFile);
+    return (void *)setSuccess("");
 }
 
 void rewriteYaml(void *_entity, char *tablePath)

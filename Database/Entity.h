@@ -21,8 +21,8 @@ typedef struct
     Core **(*newStack)();
     int (*initializer)(void *, unsigned char, char *);
     int (*push)(void *, char *, char *);
-    int (*commit)(char *, Header *, Core *);
-    int (*load)(void *, char *);
+    void *(*commit)(char *, Header *, Core *);
+    void *(*load)(void *, char *);
     void (*reload)(void *, char *);
     void (*set)(void *, int, int, char *);
     void (*remove)(void *, int);

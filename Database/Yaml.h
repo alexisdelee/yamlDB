@@ -17,19 +17,19 @@ typedef struct
 
 typedef struct
 {
-    int (*create)(char *);
-    int (*drop)(char *);
+    void *(*create)(char *);
+    void *(*drop)(char *);
 } Database;
 
 typedef struct Table
 {
-    int (*load)(char *, char *, void *);
-    int (*create)(char *, char *, void *);
-    int (*insert)(char *, char *, void *);
-    Stack *(*select)(char *, char *, void *, char *, char *, char *, ...);
-    int (*update)(char *, char *, void *, char *, char *, char *, char *, char *);
-    int (*delete)(char *, char *, void *, char *, char *, char *);
-    int (*drop)(char *, char *);
+    void *(*load)(char *, char *, void *);
+    void *(*create)(char *, char *, void *);
+    void *(*insert)(char *, char *, void *);
+    void *(*select)(char *, char *, void *, void **, char *, char *, char *, ...);
+    void *(*update)(char *, char *, void *, char *, char *, char *, char *, char *);
+    void *(*delete)(char *, char *, void *, char *, char *, char *);
+    void *(*drop)(char *, char *);
 } Table;
 
 typedef struct

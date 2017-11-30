@@ -93,7 +93,7 @@ int eval(char *operator, char *valueA, char *valueB, int type)
             status = engine(authorization, (double)strcmp(valueA, valueB), (double)strcmp(valueB, valueA));
         } else {
             if((a = str2d(valueA)) == -HUGE_VAL || (b = str2d(valueB)) == -HUGE_VAL) { // échec convertion
-                danger(false, "Exception: bad type\n");
+                // danger(false, "Exception: bad type\n");
                 return false;
             } else {
                 status = engine(authorization, a, b);

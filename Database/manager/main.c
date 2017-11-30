@@ -8,7 +8,11 @@
 #include "../Entity.h"
 #include "../Yaml.h"
 
+#include "../../Common/throw.h"
+#include "../../Common/settings.h"
+
 int ansiSupport = false;
+Settings settings;
 
 void displayFunc(char *, int);
 void displayFuncTable(char *, int);
@@ -24,6 +28,13 @@ int main(int argc, char **argv)
     if(argc >= 2 && !strcmp(argv[1], "--color-mode")) {
         ansiSupport = true;
     }
+
+    // debug
+    settings = getSettings();
+
+    // Throw *err = setError("test");
+    // printStackError(err, settings.debug);
+    // debug
 
     welcome("Starting the database shell console...\n\n");
 
@@ -49,7 +60,8 @@ void displayFunc(char *value, int index)
     Interface interface = interfaceInit();
     Interface _interface;
     Yaml yaml = yamlInit();
-    Stack *stack;
+    Stack *stack = NULL;
+    Throw *err = NULL;
     char *database = NULL;
     char *table = NULL;
     int status = true;
@@ -63,12 +75,14 @@ void displayFunc(char *value, int index)
             return;
         case 1: // "Create a database"
             database = interface.input("database> ");
-            yaml.database.create(database);
+            err = (Throw *)yaml.database.create(database);
+            printStackError(err, settings.debug);
 
             break;
         case 2: // "Drop a database"
             database = interface.input("database> ");
-            yaml.database.drop(database);
+            err = (Throw *)yaml.database.drop(database);
+            printStackError(err, settings.debug);
 
             break;
         case 3: // "Add a table"
@@ -94,7 +108,8 @@ void displayFunc(char *value, int index)
             entity->_.initializer(entity, YAML_STRING, "username");
             entity->_.initializer(entity, YAML_CHARACTER, "capitalize");
 
-            yaml.table.create(database, table, entity);
+            err = (Throw *)yaml.table.create(database, table, entity);
+            printStackError(err, settings.debug);
             freeEntity(entity);
 
             break;
@@ -103,26 +118,38 @@ void displayFunc(char *value, int index)
             table = interface.input("table> ");
 
             entity = entityInit();
-            if(yaml.table.load(database, table, entity)) {
+            err = (Throw *)yaml.table.load(database, table, entity);
+            if(err->err) {
+                printStackError(err, settings.debug);
+            } else {
                 entity->core = entity->_.newStack(entity);
 
                 entity->_.push(entity, "19", NULL);
                 entity->_.push(entity, "bricetoutpuissant@gmail.com", NULL);
                 entity->_.push(entity, "B", NULL);
 
-                yaml.table.insert(database, table, entity);
+                free(err);
+                err = yaml.table.insert(database, table, entity);
+                printStackError(err, settings.debug);
             }
 
             freeEntity(entity);
 
             break;
         case 5: // "Select lines in a table"
+            database = interface.input("database> ");
+            table = interface.input("table> ");
+
             entity = entityInit();
+            err = (Throw *)yaml.table.load(database, table, entity);
+            if(err->err) {
+                printStackError(err, settings.debug);
+            } else {
+                err = (Throw *)yaml.table.select(database, table, entity, (void **)(&stack), "<>", "age", "20", "*", NULL);
 
-            if(yaml.table.load("esgi", "test", entity)) {
-                stack = yaml.table.select("esgi", "test", entity, "=", "username", "bricetoutpuissant@gmail.com", "*", NULL);
-
-                if(stack) {
+                if(err->err) {
+                    printStackError(err, settings.debug);
+                } else {
                     for(i = 0; i < stack->size; i++) {
                         if(stack->indexed[i].active == NULL) {
                             for(j = 0; j < stack->indexed[i].size; j++) {
@@ -150,20 +177,40 @@ void displayFunc(char *value, int index)
 
             break;
         case 6: // "Update a line in a table"
-            entity = entityInit();
+            database = interface.input("database> ");
+            table = interface.input("table> ");
 
-            if(yaml.table.load("esgi", "test", entity)) {
-                yaml.table.update("esgi", "test", entity, "username", "toto", ">=", "age", "20");
+            entity = entityInit();
+            err = (Throw *)yaml.table.load(database, table, entity);
+            if(err->err) {
+                printStackError(err, settings.debug);
+            } else {
+                free(err);
+
+                err = yaml.table.update(database, table, entity, "username", "toto", ">=", "age", "20");
+                if(err->err) {
+                    printStackError(err, settings.debug);
+                }
             }
 
             freeEntity(entity);
 
             break;
         case 7: // "Delete a line in table"
-            entity = entityInit();
+            database = interface.input("database> ");
+            table = interface.input("table> ");
 
-            if(yaml.table.load("esgi", "test", entity)) {
-                yaml.table.delete("esgi", "test", entity, ">=", "age", "20");
+            entity = entityInit();
+            err = (Throw *)yaml.table.load(database, table, entity);
+            if(err->err) {
+                printStackError(err, true);
+            } else {
+                free(err);
+
+                err = yaml.table.delete(database, table, entity, ">=", "age", "20");
+                if(err->err) {
+                    printStackError(err, settings.debug);
+                }
             }
 
             freeEntity(entity);
@@ -173,13 +220,16 @@ void displayFunc(char *value, int index)
             database = interface.input("database> ");
             table = interface.input("table> ");
 
-            yaml.table.drop(database, table);
+            err = (Throw *)yaml.table.drop(database, table);
+            printStackError(err, settings.debug);
 
             break;
     }
 
     _safeFree(&database);
     _safeFree(&table);
+
+    if(err != NULL) free(err);
 }
 
 void displayFuncTable(char *value, int index)
