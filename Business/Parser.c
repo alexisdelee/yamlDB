@@ -65,7 +65,6 @@ void build(char *s, Node **tree, void (*callback)(char *, void *))
 		_seed = initNode(token->data[i], "node");
 
 		if(_seed->data[0] == '@') {
-			// sprintf(_seed->data, "%s", token->data[i] + 1);
 			sprintf(_seed->type, "regexp");
 		}
 

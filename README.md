@@ -40,6 +40,6 @@ Ce dossier contient un ensemble de fonctions permettant de faciliter le dévelop
 
 ### Depot
 
-Emplacement par défaut de la base de données.
+Emplacement par défaut de la base de données dans le dossier HOMEPATH\.yaml sur Windows et ~\.yaml sur Linux.
 
 Dans les dossiers Database, Business and Services, des sous-dossiers ``manager/`` sont créés et contiennent un point d'entrée vers le sous-projet (__``main.c``__).

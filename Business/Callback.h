@@ -1,15 +1,17 @@
 #ifndef CALLBACKS_H_INCLUDED
 #define CALLBACKS_H_INCLUDED
 
-typedef struct Database Database;
-struct Database
+extern int debug;
+
+typedef struct DatabaseStatement DatabaseStatement;
+struct DatabaseStatement
 {
     void (*create)(char *, void *);
     void (*drop)(char *, void *);
 };
 
-typedef struct Table Table;
-struct Table
+typedef struct TableStatement TableStatement;
+struct TableStatement
 {
     void (*create)(char *, void *);
     void (*drop)(char *, void *);
@@ -21,8 +23,8 @@ struct Table
 typedef struct Callback Callback;
 struct Callback
 {
-    Database database;
-    Table table;
+    DatabaseStatement database;
+    TableStatement table;
 };
 
 Callback callbackInit();

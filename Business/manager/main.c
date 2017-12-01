@@ -3,15 +3,13 @@
 #include <string.h>
 
 #include "../../Common/toolbox.h"
-#include "../arguments.h"
+#include "../../Common/throw.h"
+#include "../../Common/settings.h"
 #include "../Parser.h"
 #include "../Callback.h"
 
-int ansiSupport = false;
-
-unsigned char colorModeOption = false;
-unsigned char statisticModeOption = false;
-char container[256];
+int ansiSupport;
+int debug;
 
 int main(int argc, char **argv)
 {
@@ -19,7 +17,9 @@ int main(int argc, char **argv)
     Parser parser = parserInit();
     Callback callback = callbackInit();
 
-    analyzerArguments(argc, argv);
+    Settings settings = getSettings();
+    ansiSupport = settings.allowColor;
+    debug = settings.debug;
 
     parser.build("CREATE DATABASE @DATABASE", &tree, callback.database.create);
     parser.build("DROP DATABASE @DATABASE", &tree, callback.database.drop);
@@ -43,16 +43,13 @@ int main(int argc, char **argv)
     // parser.build("select @ARGUMENTS from @TABLE where @KEY @OPERATOR @VALUE", &tree, func);
     // parser.build("select @ARGUMENTS from @TABLE", &tree, func);
 
-    if(statisticModeOption) {
+    if(settings.tree) {
         parser.statistic(tree, 1);
         printf("\n");
     }
 
-    // parser.sql("create table esgi.test (name VARCHAR, age REAL)", &tree);
-    parser.sql("update esgi.test set name = toto where id = ec9f", &tree);
-
+    parser.sql("delete from esgi.test where age = 19", &tree);
     freeTree(tree);
-    // free(tree); /* double free or corruption */
 
     return 0;
 }
