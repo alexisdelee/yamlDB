@@ -5,6 +5,7 @@
 #include <stdarg.h>
 
 #include "../Common/toolbox.h"
+#include "../Common/colorShell.h"
 #include "Parser.h"
 
 void build(char *, Node **, void (*callback)(char *, void *));
@@ -140,7 +141,7 @@ void search(char *s, Node **tree)
 
 		free(parameters.data);
 	} else {
-		printf("\"%s\" is not recognised as an internal command\n", s);
+		danger(false, "\"%s\" is not recognised as an internal command\n", s);
 	}
 }
 
@@ -443,7 +444,7 @@ int regexp(char *rgx, char *str, void *_parameters)
 			return true;
 		}
 	} else {
-		printf("Exception: unknown REGEXP\n");
+		danger(false, "Exception: unknown REGEXP\n");
 	}
 
 	return false;

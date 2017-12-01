@@ -5,6 +5,8 @@
 #include "../../Common/toolbox.h"
 #include "../../Common/throw.h"
 #include "../../Common/settings.h"
+#include "../../Common/Interface.h"
+#include "../../Common/colorShell.h"
 #include "../Parser.h"
 #include "../Callback.h"
 
@@ -16,6 +18,8 @@ int main(int argc, char **argv)
     Node *tree = initNode(".", "root");
     Parser parser = parserInit();
     Callback callback = callbackInit();
+    Interface interface = interfaceInit();
+    char *sql = NULL;
 
     Settings settings = getSettings();
     ansiSupport = settings.allowColor;
@@ -48,7 +52,19 @@ int main(int argc, char **argv)
         printf("\n");
     }
 
-    parser.sql("delete from esgi.test where age = 19", &tree);
+    while(true) {
+        if(sql != NULL) free(sql);
+
+        sql = interface.input("sql> ");
+        if(!strcmp(sql, "exit")) {
+            success("\nClosing the sql console...\n");
+            break;
+        }
+
+        parser.sql(sql, &tree);
+    }
+
+    free(sql);
     freeTree(tree);
 
     return 0;
