@@ -40,7 +40,7 @@ Node *initNode(char *data, char *type)
 
 	sprintf(seed->data, "%s", data);
 	sprintf(seed->type, "%s", type);
-	seed->size = 0;
+	seed->size = false;
 	seed->next = NULL;
 	seed->callback = NULL;
 
@@ -61,7 +61,7 @@ void build(char *s, Node **tree, void (*callback)(char *, void *))
 	int active, i, j;
 
 	for(i = 0; i < token->size; i++) {
-		active = 0;
+		active = false;
 
 		_seed = initNode(token->data[i], "node");
 
@@ -77,18 +77,20 @@ void build(char *s, Node **tree, void (*callback)(char *, void *))
 		for(j = 0; j < seed->size; j++) {
 			if(!strcmp(seed->next[j]->data, token->data[i])) {
 				seed = seed->next[j];
-				active = 1;
+				active = true;
 				break;
 			}
 		}
 
-		if(!active) {
+		if(active == false) {
 			seed->next = realloc(seed->next, sizeof(Node *) * ++seed->size);
 			seed->next[seed->size - 1] = _seed;
 
 			seed = seed->next[seed->size - 1];
 		}
 	}
+
+	seed->callback = callback;
 }
 
 /// <summary>
@@ -130,7 +132,7 @@ void search(char *s, Node **tree)
 		}
 	}
 
-	if(active && seed->next == NULL) {
+	if(active && (seed->next == NULL || seed->callback)) {
 		if(seed->callback) {
 			seed->callback(s, &parameters);
 		}
@@ -206,7 +208,7 @@ void parseArguments(void *_parameters, char *buffer)
     char *buf = malloc(sizeof(char) * (strlen(buffer) + 1));
     char *p, *start_of_word;
     int c;
-    enum states { DULL, IN_WORD, IN_STRING } state = DULL;
+    enum states { DULL, IN_WORD, IN_PARENTHESIS, IN_STRING } state = DULL;
 
     if(buf == NULL) {
         exit(-1);
@@ -224,8 +226,13 @@ void parseArguments(void *_parameters, char *buffer)
                   continue;
                 }
 
-                if (c == '"') {
+                if (c == '"' || c == '(') {
                     state = IN_STRING;
+                    start_of_word = p + 1;
+
+                    continue;
+                } else if(c == '(') {
+                    state = IN_PARENTHESIS;
                     start_of_word = p + 1;
 
                     continue;
@@ -236,13 +243,21 @@ void parseArguments(void *_parameters, char *buffer)
 
                 continue;
             case IN_STRING:
+            case IN_PARENTHESIS:
+                if (c == '"' || c == ')') {
+                    *p = 0;
+
+                    allocArguments(_parameters, start_of_word);
+                    state = DULL;
+                }
+
+                continue;
             case IN_WORD:
                 if ((state == IN_STRING && (c == '"' || c == ',' || c == '='))
                     || (state == IN_WORD && (isspace(c) || c == ',' || c == '='))) {
                     *p = 0;
 
                     allocArguments(_parameters, start_of_word);
-
                     state = DULL;
                 }
 
@@ -374,6 +389,8 @@ void allocArguments(void *_parameters, char *value)
     if(parameters->data[parameters->size - 1] == NULL) {
         exit(-1);
     }
+
+    printf("[%s]\n", value);
 }
 
 /// <summary>
@@ -439,9 +456,9 @@ int regexp(char *rgx, char *str, void *_parameters)
 		parseArguments(_parameters, str);
 		return true;
 	} else if(!strcmp(rgx, "@OPERATOR")) {
-		if(!strcmp(str, "=") || !strcmp(str, "<>")) {
+		if(strlen(str) <= 2) {
             addParameters(_parameters, str, NULL);
-			return true;
+            return true;
 		}
 	} else {
 		danger(false, "Exception: unknown REGEXP\n");

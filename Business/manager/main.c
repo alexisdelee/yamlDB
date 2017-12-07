@@ -31,9 +31,12 @@ int main(int argc, char **argv)
     parser.build("DROP TABLE @TABLE", &tree, callback.table.drop);
     parser.build("INSERT INTO @TABLE VALUES @ARGUMENTS", &tree, callback.table.insert);
     parser.build("UPDATE @TABLE SET @KEY = @VALUE WHERE @KEY @OPERATOR @VALUE", &tree, callback.table.update);
+    parser.build("UPDATE @TABLE SET @KEY = @VALUE", &tree, callback.table.update);
     parser.build("DELETE FROM @TABLE WHERE @KEY @OPERATOR @VALUE", &tree, callback.table.delete);
-    // parser.build("SELECT @ARGUMENTS FROM @TABLE WHERE @KEY @OPERATOR @VALUE", &tree, func);
-    // parser.build("SELECT @ARGUMENTS FROM @TABLE", &tree, func);
+    parser.build("DELETE FROM @TABLE", &tree, callback.table.delete);
+    parser.build("SELECT @ARGUMENTS FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @TABLE", &tree, callback.table.information);
+    parser.build("SELECT @ARGUMENTS FROM @TABLE WHERE @KEY @OPERATOR @VALUE", &tree, callback.table.selectWhere);
+    parser.build("SELECT @ARGUMENTS FROM @TABLE", &tree, callback.table.select);
 
     /* ---------- */
 
@@ -43,9 +46,12 @@ int main(int argc, char **argv)
     parser.build("drop table @TABLE", &tree, callback.table.drop);
     parser.build("insert into @TABLE values @ARGUMENTS", &tree, callback.table.insert);
     parser.build("update @TABLE set @KEY = @VALUE where @KEY @OPERATOR @VALUE", &tree, callback.table.update);
+    parser.build("update @TABLE set @KEY = @VALUE", &tree, callback.table.update);
     parser.build("delete from @TABLE where @KEY @OPERATOR @VALUE", &tree, callback.table.delete);
-    // parser.build("select @ARGUMENTS from @TABLE where @KEY @OPERATOR @VALUE", &tree, func);
-    // parser.build("select @ARGUMENTS from @TABLE", &tree, func);
+    parser.build("delete from @TABLE", &tree, callback.table.delete);
+    parser.build("select @ARGUMENTS from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = @TABLE", &tree, callback.table.information);
+    parser.build("select @ARGUMENTS from @TABLE where @KEY @OPERATOR @VALUE", &tree, callback.table.selectWhere);
+    parser.build("select @ARGUMENTS from @TABLE", &tree, callback.table.select);
 
     if(settings.tree) {
         parser.statistic(tree, 1);

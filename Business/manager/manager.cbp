@@ -39,10 +39,30 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Common/colorShell.h" />
+		<Unit filename="../../Common/settings.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Common/settings.h" />
+		<Unit filename="../../Common/throw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Common/throw.h" />
 		<Unit filename="../../Common/toolbox.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../Common/toolbox.h" />
+		<Unit filename="../../Database/Engine.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Database/Engine.h" />
+		<Unit filename="../../Database/Entity.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Database/Entity.h" />
+		<Unit filename="../../Database/Yaml.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Database/Yaml.h" />
 		<Unit filename="../Callback.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -51,10 +71,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Parser.h" />
-		<Unit filename="../arguments.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../arguments.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

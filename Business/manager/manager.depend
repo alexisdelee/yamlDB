@@ -199,13 +199,14 @@
 	"toolbox.h"
 	"colorShell.h"
 
-1511905567 source:c:\wamp\www\projets\yamldb\business\parser.c
+1512133613 source:c:\wamp\www\projets\yamldb\business\parser.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<ctype.h>
 	<stdarg.h>
 	"../Common/toolbox.h"
+	"../Common/colorShell.h"
 	"Parser.h"
 
 1511905567 c:\wamp\www\projets\yamldb\business\parser.h
@@ -220,7 +221,7 @@
 	"../Parser.h"
 	"../Callback.h"
 
-1512119421 c:\wamp\www\projets\yamldb\business\callback.h
+1512133985 c:\wamp\www\projets\yamldb\business\callback.h
 
 1512063746 source:c:\wamp\www\projets\yamldb\database\engine.c
 	<stdio.h>
@@ -262,12 +263,13 @@
 
 1512072021 c:\wamp\www\projets\yamldb\database\yaml.h
 
-1512119335 source:c:\wamp\www\projets\yamldb\business\callback.c
+1512134063 source:c:\wamp\www\projets\yamldb\business\callback.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	"../Common/toolbox.h"
 	"../Common/throw.h"
 	"../Database/Yaml.h"
+	"../Database/Entity.h"
 	"Callback.h"
 

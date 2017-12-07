@@ -18,6 +18,9 @@ struct TableStatement
     void (*insert)(char *, void *);
     void (*update)(char *, void *);
     void (*delete)(char *, void *);
+    void (*select)(char *, void *);
+    void (*selectWhere)(char *, void *);
+    void (*information)(char *, void *);
 };
 
 typedef struct Callback Callback;

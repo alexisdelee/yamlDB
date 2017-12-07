@@ -55,6 +55,7 @@ void displayFunc(char *value, int index)
     Yaml yaml = yamlInit();
     Stack *stack = NULL;
     Throw *err = NULL;
+    SelectStatement statement;
     char *database = NULL;
     char *table = NULL;
     int status = true;
@@ -138,7 +139,12 @@ void displayFunc(char *value, int index)
             if(err->err) {
                 printStackError(err, debug);
             } else {
-                err = (Throw *)yaml.table.select(database, table, entity, (void **)(&stack), "<>", "age", "20", "*", NULL);
+                statement.size = 0;
+                addStatement(&statement, "*");
+                // whereStatement(&statement, "<=", "age", "20");
+                whereStatement(&statement, "@", "", "");
+
+                err = (Throw *)yaml.table.select(database, table, entity, (void **)(&stack), statement);
 
                 if(err->err) {
                     printStackError(err, debug);
@@ -152,7 +158,7 @@ void displayFunc(char *value, int index)
                                 }
 
                                 if(!(entity->header->type[j] & YAML_UNDEFINED)) {
-                                    printf("\n%2svalue: \"%s\", type: \"%s\"", "", entity->core[i]->data[id], entity->header->type[id] & YAML_INTEGER ? "integer" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "string")));
+                                    printf("\n%2svalue: \"%s\", type: \"%s\"", "", entity->core[i]->data[id], entity->header->type[id] & YAML_INTEGER ? "int" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "varchar")));
                                 }
 
                                 if(j == stack->indexed[i].size - 1) {
@@ -164,6 +170,8 @@ void displayFunc(char *value, int index)
 
                     destroyStack(stack);
                 }
+
+                freeStatement(&statement);
             }
 
             freeEntity(entity);
@@ -180,7 +188,8 @@ void displayFunc(char *value, int index)
             } else {
                 free(err);
 
-                err = yaml.table.update(database, table, entity, "username", "toto", ">=", "age", "20");
+                // err = yaml.table.update(database, table, entity, "capitalize", "Z", "<=", "age", "20");
+                err = yaml.table.update(database, table, entity, "capitalize", "Z", "@", "", "");
                 if(err->err) {
                     printStackError(err, debug);
                 }

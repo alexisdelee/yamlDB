@@ -38,7 +38,7 @@ Construire un ensemble de fonctions permettant d’exécuter vos requêtes __SQL
 
 Ce dossier contient un ensemble de fonctions permettant de faciliter le développement.
 
-### Depot
+### Dépôt
 
 Emplacement par défaut de la base de données dans le dossier ``HOMEPATH\\.yaml`` sur Windows et ``~\\.yaml`` sur Linux.
 

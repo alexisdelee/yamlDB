@@ -182,3 +182,184 @@
 
 1511905567 c:\wamp\www\projets\yamldb\business\arguments.h
 
+1511905567 source:e:\yamldb\common\colorshell.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdarg.h>
+	"colorShell.h"
+
+1511905567 e:\yamldb\common\colorshell.h
+
+1511905567 source:e:\yamldb\common\interface.c
+	<stdio.h>
+	<stdlib.h>
+	<stdarg.h>
+	<string.h>
+	<limits.h>
+	<errno.h>
+	<math.h>
+	"toolbox.h"
+	"colorShell.h"
+	"Interface.h"
+
+1512072885 e:\yamldb\common\toolbox.h
+
+1511905567 e:\yamldb\common\interface.h
+
+1512055210 source:e:\yamldb\common\throw.c
+	<stdio.h>
+	<stdlib.h>
+	<stdarg.h>
+	<string.h>
+	"toolbox.h"
+	"colorShell.h"
+	"throw.h"
+
+1512055179 e:\yamldb\common\throw.h
+
+1512480831 source:e:\yamldb\common\toolbox.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<math.h>
+	"toolbox.h"
+	"colorShell.h"
+
+1512063746 source:e:\yamldb\database\engine.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<errno.h>
+	<math.h>
+	"../Common/toolbox.h"
+	"../Common/colorShell.h"
+	"Engine.h"
+
+1511905567 e:\yamldb\database\engine.h
+
+1512061572 source:e:\yamldb\database\entity.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Common/toolbox.h"
+	"../Common/throw.h"
+	"../Common/colorShell.h"
+	"Engine.h"
+	"Entity.h"
+
+1512061368 e:\yamldb\database\entity.h
+
+1512483562 source:e:\yamldb\database\yaml.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<errno.h>
+	<dirent.h>
+	<stdarg.h>
+	"../Common/toolbox.h"
+	"../Common/throw.h"
+	"../Common/colorShell.h"
+	"Entity.h"
+	"Engine.h"
+	"Yaml.h"
+
+1512300397 e:\yamldb\database\yaml.h
+
+1512484657 source:e:\yamldb\audit\global.tu.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	"../Common/toolbox.h"
+	"../Common/throw.h"
+	"../Common/colorShell.h"
+	"../Database/Yaml.h"
+	"../Database/Entity.h"
+
+1511905567 source:c:\users\alexis\desktop\yamldb\common\colorshell.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdarg.h>
+	"colorShell.h"
+
+1511905567 c:\users\alexis\desktop\yamldb\common\colorshell.h
+
+1511905567 source:c:\users\alexis\desktop\yamldb\common\interface.c
+	<stdio.h>
+	<stdlib.h>
+	<stdarg.h>
+	<string.h>
+	<limits.h>
+	<errno.h>
+	<math.h>
+	"toolbox.h"
+	"colorShell.h"
+	"Interface.h"
+
+1512072885 c:\users\alexis\desktop\yamldb\common\toolbox.h
+
+1511905567 c:\users\alexis\desktop\yamldb\common\interface.h
+
+1512055210 source:c:\users\alexis\desktop\yamldb\common\throw.c
+	<stdio.h>
+	<stdlib.h>
+	<stdarg.h>
+	<string.h>
+	"toolbox.h"
+	"colorShell.h"
+	"throw.h"
+
+1512055179 c:\users\alexis\desktop\yamldb\common\throw.h
+
+1512507580 source:c:\users\alexis\desktop\yamldb\common\toolbox.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<math.h>
+	"toolbox.h"
+	"colorShell.h"
+
+1512063746 source:c:\users\alexis\desktop\yamldb\database\engine.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<errno.h>
+	<math.h>
+	"../Common/toolbox.h"
+	"../Common/colorShell.h"
+	"Engine.h"
+
+1511905567 c:\users\alexis\desktop\yamldb\database\engine.h
+
+1512061572 source:c:\users\alexis\desktop\yamldb\database\entity.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"../Common/toolbox.h"
+	"../Common/throw.h"
+	"../Common/colorShell.h"
+	"Engine.h"
+	"Entity.h"
+
+1512061368 c:\users\alexis\desktop\yamldb\database\entity.h
+
+1512487425 source:c:\users\alexis\desktop\yamldb\database\yaml.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<errno.h>
+	<dirent.h>
+	<stdarg.h>
+	"../Common/toolbox.h"
+	"../Common/throw.h"
+	"../Common/colorShell.h"
+	"Entity.h"
+	"Engine.h"
+	"Yaml.h"
+
+1512300397 c:\users\alexis\desktop\yamldb\database\yaml.h
+
