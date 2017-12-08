@@ -135,7 +135,6 @@ int pushCore(void *_entity, char *data, char *id)
         danger(false, "Exception: overflow\n");
         return false;
     } else if(!_isTypeOf(data, (int)entity->header->type[entity->core[entity->length - 1]->size])) {
-        printf("[%s|%d]\n", data, (int)entity->header->type[entity->core[entity->length - 1]->size]);
         danger(false, "Exception: this datatype is not expected for this data\n");
         return false;
     }

@@ -17,6 +17,15 @@ int debug; // debug mode
 void displayFunc(char *, int);
 void displayFuncTable(char *, int);
 
+void createDatabaseOption();
+void dropDatabaseOption();
+void addTableOption();
+void insertTableOption();
+void selectTableOption();
+void updateTableOption();
+void deleteTableOption();
+void dropTableOption();
+
 int main(int argc, char **argv)
 {
     int status = true;
@@ -50,197 +59,338 @@ int main(int argc, char **argv)
 
 void displayFunc(char *value, int index)
 {
-    Interface interface = interfaceInit();
-    Interface _interface;
-    Yaml yaml = yamlInit();
-    Stack *stack = NULL;
-    Throw *err = NULL;
-    SelectStatement statement;
-    char *database = NULL;
-    char *table = NULL;
-    int status = true;
-    int startIndex = true;
-    int i, j, id;
-    Entity *entity;
-
     switch(index) {
         case 0: // "Quit"
             success("\nClosing the database shell console...\n");
             return;
         case 1: // "Create a database"
-            database = interface.input("database> ");
-            err = (Throw *)yaml.database.create(database);
-            printStackError(err, debug);
-
+            createDatabaseOption();
             break;
         case 2: // "Drop a database"
-            database = interface.input("database> ");
-            err = (Throw *)yaml.database.drop(database);
-            printStackError(err, debug);
-
+            dropDatabaseOption();
             break;
         case 3: // "Add a table"
-            database = interface.input("database> ");
-            table = interface.input("table> ");
-            // yaml.table.create(database, table);
-
-            /* _interface = interfaceInit();
-            _interface.options.quit = true;
-            _safeStrdup(&_interface.options.quitLabel, "Save prototype");
-
-            printf("\n");
-            welcome("Starting the table shell console...\n\n");
-
-            do {
-                status = _interface.prompt(startIndex, displayFuncTable, &_interface.options, "Integer", "Real", "Char", "String", NULL);
-                startIndex = false;
-            } while(status); */
-
-            entity = entityInit();
-
-            entity->_.initializer(entity, YAML_REAL, "age");
-            entity->_.initializer(entity, YAML_STRING, "username");
-            entity->_.initializer(entity, YAML_CHARACTER, "capitalize");
-
-            err = (Throw *)yaml.table.create(database, table, entity);
-            printStackError(err, debug);
-            freeEntity(entity);
-
+            addTableOption();
             break;
         case 4: // "Insert a line in a table"
-            database = interface.input("database> ");
-            table = interface.input("table> ");
-
-            entity = entityInit();
-            err = (Throw *)yaml.table.load(database, table, entity);
-            if(err->err) {
-                printStackError(err, debug);
-            } else {
-                entity->core = entity->_.newStack(entity);
-
-                entity->_.push(entity, "19", NULL);
-                entity->_.push(entity, "bricetoutpuissant@gmail.com", NULL);
-                entity->_.push(entity, "B", NULL);
-
-                free(err);
-                err = yaml.table.insert(database, table, entity);
-                printStackError(err, debug);
-            }
-
-            freeEntity(entity);
-
+            insertTableOption();
             break;
         case 5: // "Select lines in a table"
-            database = interface.input("database> ");
-            table = interface.input("table> ");
-
-            entity = entityInit();
-            err = (Throw *)yaml.table.load(database, table, entity);
-            if(err->err) {
-                printStackError(err, debug);
-            } else {
-                statement.size = 0;
-                addStatement(&statement, "*");
-                // whereStatement(&statement, "<=", "age", "20");
-                whereStatement(&statement, "@", "", "");
-
-                err = (Throw *)yaml.table.select(database, table, entity, (void **)(&stack), statement);
-
-                if(err->err) {
-                    printStackError(err, debug);
-                } else {
-                    for(i = 0; i < stack->size; i++) {
-                        if(stack->indexed[i].active == NULL) {
-                            for(j = 0; j < stack->indexed[i].size; j++) {
-                                id = stack->indexed[i].ids[j];
-                                if(!j) {
-                                    printf("id:%s => { ", entity->core[i]->id);
-                                }
-
-                                if(!(entity->header->type[j] & YAML_UNDEFINED)) {
-                                    printf("\n%2svalue: \"%s\", type: \"%s\"", "", entity->core[i]->data[id], entity->header->type[id] & YAML_INTEGER ? "int" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "varchar")));
-                                }
-
-                                if(j == stack->indexed[i].size - 1) {
-                                    printf("\n}\n");
-                                }
-                            }
-                        }
-                    }
-
-                    destroyStack(stack);
-                }
-
-                freeStatement(&statement);
-            }
-
-            freeEntity(entity);
-
+            selectTableOption();
             break;
         case 6: // "Update a line in a table"
-            database = interface.input("database> ");
-            table = interface.input("table> ");
-
-            entity = entityInit();
-            err = (Throw *)yaml.table.load(database, table, entity);
-            if(err->err) {
-                printStackError(err, debug);
-            } else {
-                free(err);
-
-                // err = yaml.table.update(database, table, entity, "capitalize", "Z", "<=", "age", "20");
-                err = yaml.table.update(database, table, entity, "capitalize", "Z", "@", "", "");
-                if(err->err) {
-                    printStackError(err, debug);
-                }
-            }
-
-            freeEntity(entity);
-
+            updateTableOption();
             break;
         case 7: // "Delete a line in table"
-            database = interface.input("database> ");
-            table = interface.input("table> ");
+            deleteTableOption();
+            break;
+        case 8: // "Drop a table"
+            dropTableOption();
+            break;
+    }
+}
 
-            entity = entityInit();
-            err = (Throw *)yaml.table.load(database, table, entity);
-            if(err->err) {
-                printStackError(err, true);
+void createDatabaseOption()
+{
+    Interface interface = interfaceInit();
+    Yaml yaml = yamlInit();
+
+    char *database = interface.input("database> ");
+    Throw *err = (Throw *)yaml.database.create(database);
+    printStackError(err, debug);
+
+    _safeFree(&database);
+    free(err);
+}
+
+void dropDatabaseOption()
+{
+    Interface interface = interfaceInit();
+    Yaml yaml = yamlInit();
+
+    char *database = interface.input("database> ");
+    Throw *err = (Throw *)yaml.database.drop(database);
+    printStackError(err, debug);
+
+    _safeFree(&database);
+    free(err);
+}
+
+void addTableOption()
+{
+    Interface interface = interfaceInit();
+    Yaml yaml = yamlInit();
+    char *type = NULL;
+    char *value = NULL;
+    int status = 0;
+
+    char *database = interface.input("database> ");
+    char *table = interface.input("table> ");
+
+    Entity *entity = entityInit();
+
+    while(true) {
+        welcome("input the type and the data to insert : [1] Integer [2] Real [3] Char [4] Varchar %5s[.send] start creation\n", "");
+        type = interface.input("type> ");
+        if(!strcmp(type, ".send")) {
+            break;
+        }
+
+        value = interface.input("data> ");
+        if(!strcmp(type, "1")) {
+            entity->_.initializer(entity, YAML_INTEGER, value);
+            status++;
+        } else if(!strcmp(type, "2")) {
+            entity->_.initializer(entity, YAML_REAL, value);
+            status++;
+        } else if(!strcmp(type, "3")) {
+            entity->_.initializer(entity, YAML_CHARACTER, value);
+            status++;
+        } else if(!strcmp(type, "4")) {
+            entity->_.initializer(entity, YAML_STRING, value);
+            status++;
+        } else {
+            printStackError(setError("Exception: type unknow"), debug);
+        }
+    }
+
+    if(status) {
+        Throw *err = (Throw *)yaml.table.create(database, table, entity);
+        printStackError(err, debug);
+        free(err);
+    }
+
+    freeEntity(entity);
+    _safeFree(&database);
+    _safeFree(&table);
+    _safeFree(&type);
+    _safeFree(&value);
+}
+
+void insertTableOption()
+{
+    Interface interface = interfaceInit();
+    Yaml yaml = yamlInit();
+
+    char *database = interface.input("database> ");
+    char *table = interface.input("table> ");
+    char *value = NULL;
+    char header[258];
+    int i;
+
+    Entity *entity = entityInit();
+    Throw *err = (Throw *)yaml.table.load(database, table, entity);
+    if(err->err) {
+        printStackError(err, debug);
+    } else {
+        entity->core = entity->_.newStack(entity);
+
+        welcome("input the value that you want insert in the table\n");
+        for(i = 0; i < entity->header->size; i++) {
+            _safeFree(&value);
+
+            do {
+                sprintf(header, "%s> ", entity->header->data[i]);
+                value = interface.input(header);
+            } while(entity->_.push(entity, value, NULL) == 0);
+        }
+
+        free(err);
+        err = yaml.table.insert(database, table, entity);
+        printStackError(err, debug);
+    }
+
+    freeEntity(entity);
+    _safeFree(&database);
+    _safeFree(&table);
+    _safeFree(&value);
+    free(err);
+}
+
+void selectTableOption()
+{
+    Interface interface = interfaceInit();
+    Yaml yaml = yamlInit();
+    SelectStatement statement;
+    Stack *stack = NULL;
+    int i, j, id;
+    char *isWhereStatement = NULL, *operator = NULL, *key = NULL, *value = NULL;
+
+    char *database = interface.input("database> ");
+    char *table = interface.input("table> ");
+
+    Entity *entity = entityInit();
+    Throw *err = (Throw *)yaml.table.load(database, table, entity);
+    if(err->err) {
+        printStackError(err, debug);
+    } else {
+        statement.size = 0;
+
+        welcome("input the column that you want select in the table %5s[.send] start select\n", "");
+        while(true) {
+            _safeFree(&value);
+            value = interface.input("value> ");
+
+            if(!strcmp(value, ".send")) {
+                break;
             } else {
-                free(err);
+                addStatement(&statement, value);
+            }
+        }
 
-                err = yaml.table.delete(database, table, entity, ">=", "age", "20");
-                if(err->err) {
-                    printStackError(err, debug);
+        _safeFree(&value);
+        isWhereStatement = interface.input("use condition ? [y/N]> ");
+        if(!strcmp(isWhereStatement, "Y") || !strcmp(isWhereStatement, "y")) {
+            key = interface.input("key> ");
+            operator = interface.input("operator> ");
+            value = interface.input("value> ");
+
+            whereStatement(&statement, operator, key, value);
+        } else {
+            whereStatement(&statement, "@", "", "");
+        }
+
+        err = (Throw *)yaml.table.select(database, table, entity, (void **)(&stack), statement);
+
+        if(err->err) {
+            printStackError(err, debug);
+        } else {
+            for(i = 0; i < stack->size; i++) {
+                if(stack->indexed[i].active == NULL) {
+                    for(j = 0; j < stack->indexed[i].size; j++) {
+                        id = stack->indexed[i].ids[j];
+                        if(!j) {
+                            printf("id:%s => { ", entity->core[i]->id);
+                        }
+
+                        if(!(entity->header->type[j] & YAML_UNDEFINED)) {
+                            printf("\n%2svalue: \"%s\", type: \"%s\"", "", entity->core[i]->data[id], entity->header->type[id] & YAML_INTEGER ? "int" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "varchar")));
+                        }
+
+                        if(j == stack->indexed[i].size - 1) {
+                            printf("\n}\n");
+                        }
+                    }
                 }
             }
 
-            freeEntity(entity);
+            destroyStack(stack);
+        }
 
-            break;
-        case 8: // "Drop a table"
-            database = interface.input("database> ");
-            table = interface.input("table> ");
-
-            err = (Throw *)yaml.table.drop(database, table);
-            printStackError(err, debug);
-
-            break;
+        freeStatement(&statement);
     }
+
+    freeEntity(entity);
+    _safeFree(&database);
+    _safeFree(&table);
+    _safeFree(&isWhereStatement);
+    _safeFree(&operator);
+    _safeFree(&key);
+    _safeFree(&value);
+    free(err);
+}
+
+void updateTableOption()
+{
+    Interface interface = interfaceInit();
+    Yaml yaml = yamlInit();
+
+    char *database = interface.input("database> ");
+    char *table = interface.input("table> ");
+    char *isWhereStatement = NULL, *key = NULL, *value = NULL;
+    char *whereKey = NULL, *whereValue = NULL, *operator = NULL;
+
+    Entity *entity = entityInit();
+    Throw *err = (Throw *)yaml.table.load(database, table, entity);
+    if(err->err) {
+        printStackError(err, debug);
+    } else {
+        free(err);
+
+        key = interface.input("key> ");
+        value = interface.input("new value> ");
+
+        isWhereStatement = interface.input("use condition ? [y/N]> ");
+        if(!strcmp(isWhereStatement, "Y") || !strcmp(isWhereStatement, "y")) {
+            whereKey = interface.input("key> ");
+            operator = interface.input("operator> ");
+            whereValue = interface.input("value> ");
+
+            err = yaml.table.update(database, table, entity, key, value, operator, whereKey, whereValue);
+        } else {
+            err = yaml.table.update(database, table, entity, key, value, "@", "", "");
+        }
+
+        if(err->err) {
+            printStackError(err, debug);
+        }
+    }
+
+    freeEntity(entity);
+    _safeFree(&database);
+    _safeFree(&table);
+    _safeFree(&isWhereStatement);
+    _safeFree(&key);
+    _safeFree(&value);
+    _safeFree(&whereKey);
+    _safeFree(&whereValue);
+    _safeFree(&operator);
+    free(err);
+}
+
+void deleteTableOption()
+{
+    Interface interface = interfaceInit();
+    Yaml yaml = yamlInit();
+
+    char *database = interface.input("database> ");
+    char *table = interface.input("table> ");
+    char *isWhereStatement = NULL, *key = NULL, *value = NULL, *operator = NULL;
+
+    Entity *entity = entityInit();
+    Throw *err = (Throw *)yaml.table.load(database, table, entity);
+    if(err->err) {
+        printStackError(err, true);
+    } else {
+        free(err);
+
+        isWhereStatement = interface.input("use condition ? [y/N]> ");
+        if(!strcmp(isWhereStatement, "Y") || !strcmp(isWhereStatement, "y")) {
+            key = interface.input("key> ");
+            operator = interface.input("operator> ");
+            value = interface.input("value> ");
+
+            err = yaml.table.delete(database, table, entity, operator, key, value);
+        } else {
+            err = yaml.table.delete(database, table, entity, "@", "", "");
+        }
+
+        if(err->err) {
+            printStackError(err, debug);
+        }
+    }
+
+    freeEntity(entity);
+    _safeFree(&database);
+    _safeFree(&table);
+    _safeFree(&key);
+    _safeFree(&value);
+    _safeFree(&operator);
+    free(err);
+}
+
+void dropTableOption()
+{
+    Interface interface = interfaceInit();
+    Yaml yaml = yamlInit();
+
+    char *database = interface.input("database> ");
+    char *table = interface.input("table> ");
+
+    Throw *err = (Throw *)yaml.table.drop(database, table);
+    printStackError(err, debug);
 
     _safeFree(&database);
     _safeFree(&table);
-
-    if(err != NULL) free(err);
-}
-
-void displayFuncTable(char *value, int index)
-{
-    switch(index) {
-        case 0:
-            success("\nClosing the table shell console...\n\n");
-            return;
-        default:
-            printf("[%s] %d\n", value, index);
-    }
+    free(err);
 }

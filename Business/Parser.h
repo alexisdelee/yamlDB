@@ -1,6 +1,8 @@
 #ifndef PARSER_H_INCLUDED
 #define PARSER_H_INCLUDED
 
+extern int debug;
+
 typedef struct Node Node;
 struct Node
 {

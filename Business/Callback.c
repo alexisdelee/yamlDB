@@ -4,6 +4,7 @@
 
 #include "../Common/toolbox.h"
 #include "../Common/throw.h"
+#include "../Common/colorShell.h"
 #include "../Database/Yaml.h"
 #include "../Database/Entity.h"
 #include "Callback.h"
@@ -101,16 +102,16 @@ void createTableFunc(char *s, void *_parameters)
     }
 
     for(i = 2; i < parameters->size; i += 2) {
-        if(!strcmp(parameters->data[i], "int") || !strcmp(parameters->data[i], "INT")) {
-            entity->_.initializer(entity, YAML_INTEGER, parameters->data[i + 1]);
-        } else if(!strcmp(parameters->data[i], "real") || !strcmp(parameters->data[i], "REAL")) {
-            entity->_.initializer(entity, YAML_REAL, parameters->data[i + 1]);
-        } else if(!strcmp(parameters->data[i], "char") || !strcmp(parameters->data[i], "CHAR")) {
-            entity->_.initializer(entity, YAML_CHARACTER, parameters->data[i + 1]);
-        } else if(!strcmp(parameters->data[i], "varchar") || !strcmp(parameters->data[i], "VARCHAR")) {
-            entity->_.initializer(entity, YAML_STRING, parameters->data[i + 1]);
+        if(!strcmp(parameters->data[i + 1], "int") || !strcmp(parameters->data[i + 1], "INT")) {
+            entity->_.initializer(entity, YAML_INTEGER, parameters->data[i]);
+        } else if(!strcmp(parameters->data[i + 1], "real") || !strcmp(parameters->data[i + 1], "REAL")) {
+            entity->_.initializer(entity, YAML_REAL, parameters->data[i]);
+        } else if(!strcmp(parameters->data[i + 1], "char") || !strcmp(parameters->data[i + 1], "CHAR")) {
+            entity->_.initializer(entity, YAML_CHARACTER, parameters->data[i]);
+        } else if(!strcmp(parameters->data[i + 1], "varchar") || !strcmp(parameters->data[i + 1], "VARCHAR")) {
+            entity->_.initializer(entity, YAML_STRING, parameters->data[i]);
         } else {
-            err = setError("Exception: create table xxx (int xxx, real xxx, char xxx, varchar xxx)");
+            err = setError("Exception: create table xxx (xxx int, xxx real, xxx char, xxx varchar)");
             printStackError(err, debug);
 
             break;
@@ -162,6 +163,7 @@ void insertTableFunc(char *s, void *_parameters)
         }
 
         err = (Throw *)yaml.table.insert(parameters->data[0], parameters->data[1], entity);
+        printStackError(err, debug);
     }
 
     freeEntity(entity);
@@ -319,19 +321,19 @@ void displaySelectResults(Entity *entity, Stack *stack)
             for(j = 0; j < stack->indexed[i].size; j++) {
                 id = stack->indexed[i].ids[j];
                 if(!j) {
-                    printf("<\"%s\">", entity->core[i]->id);
+                    success("<\"%s\">", entity->core[i]->id);
                 }
 
                 if(!(entity->header->type[j] & YAML_UNDEFINED)) {
                     if(strcspn(entity->core[i]->data[id], " ") == strlen(entity->core[i]->data[id])) {
-                        printf(" %s", entity->core[i]->data[id]);
+                        success(" %s", entity->core[i]->data[id]);
                     } else {
-                        printf(" \"%s\"", entity->core[i]->data[id]);
+                        success(" \"%s\"", entity->core[i]->data[id]);
                     }
                 }
 
                 if(j == stack->indexed[i].size - 1) {
-                    printf("\n");
+                    success("\n");
                 }
             }
         }
@@ -382,16 +384,20 @@ void displayInformationResults(Entity *entity, Stack *stack, Token *parameters)
                 id = stack->indexed[i].ids[j];
 
                 for(k = 0; k < parameters->size; k++) {
-                    if(!strcmp(parameters->data[k], "TABLE_NAME")) {
-                        printf("\"%s.%s\" ", parameters->data[parameters->size - 2], parameters->data[parameters->size - 1]);
-                    } else if(!strcmp(parameters->data[k], "COLUMN_NAME")) {
-                        printf("\"%s\" ", entity->header->data[id]);
-                    } else if(!strcmp(parameters->data[k], "DATA_TYPE")) {
-                        printf("\"%s\" ", entity->header->type[id] & YAML_INTEGER ? "int" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "varchar")));
+                    if(!strcmp(parameters->data[k], "*") || !strcmp(parameters->data[k], "TABLE_NAME")) {
+                        success("\"%s.%s\" ", parameters->data[parameters->size - 2], parameters->data[parameters->size - 1]);
+                    }
+
+                    if(!strcmp(parameters->data[k], "*") || !strcmp(parameters->data[k], "COLUMN_NAME")) {
+                        success("\"%s\" ", entity->header->data[id]);
+                    }
+
+                    if(!strcmp(parameters->data[k], "*") || !strcmp(parameters->data[k], "DATA_TYPE")) {
+                        success("\"%s\" ", entity->header->type[id] & YAML_INTEGER ? "int" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "varchar")));
                     }
                 }
 
-                printf("\n");
+                success("\n");
             }
         }
     }

@@ -5,6 +5,7 @@
 #include <stdarg.h>
 
 #include "../Common/toolbox.h"
+#include "../Common/throw.h"
 #include "../Common/colorShell.h"
 #include "Parser.h"
 
@@ -143,7 +144,7 @@ void search(char *s, Node **tree)
 
 		free(parameters.data);
 	} else {
-		danger(false, "\"%s\" is not recognised as an internal command\n", s);
+		printStackError((Throw *)setError("\"%s\" is not recognised as an internal command", s), debug);
 	}
 }
 
@@ -389,8 +390,6 @@ void allocArguments(void *_parameters, char *value)
     if(parameters->data[parameters->size - 1] == NULL) {
         exit(-1);
     }
-
-    printf("[%s]\n", value);
 }
 
 /// <summary>
@@ -461,7 +460,7 @@ int regexp(char *rgx, char *str, void *_parameters)
             return true;
 		}
 	} else {
-		danger(false, "Exception: unknown REGEXP\n");
+		printStackError((Throw *)setError("Exception: unknown REGEXP"), debug);
 	}
 
 	return false;

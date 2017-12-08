@@ -1,6 +1,6 @@
-Cette nouvelle architecture permettra une meilleure intégration des sous-projets (Database, Business and Services) dans la solution finale, ainsi qu'une future exportation vers Linux.
+Cette nouvelle architecture permettra une meilleure intégration des sous-projets (Database, Business and Services) dans la solution finale.
 
-Des tests unitaires y sont déjà inclus __``Audit/Global.TU.c``__
+Des tests unitaires y sont déjà inclus __``Audit/Database.TU.c``__
 
 ## Architecture
 
@@ -40,6 +40,6 @@ Ce dossier contient un ensemble de fonctions permettant de faciliter le dévelop
 
 ### Dépôt
 
-Emplacement par défaut de la base de données dans le dossier ``HOMEPATH\\.yaml`` sur Windows et ``~\\.yaml`` sur Linux.
+Emplacement par défaut de la base de données dans le dossier ``HOMEPATH\.yaml`` sur Windows et ``~\.yaml`` sur Linux.
 
 Dans les dossiers Database, Business and Services, des sous-dossiers ``manager/`` sont créés et contiennent un point d'entrée vers le sous-projet (__``main.c``__).

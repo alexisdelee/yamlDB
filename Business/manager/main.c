@@ -65,6 +65,20 @@ int main(int argc, char **argv)
         if(!strcmp(sql, "exit")) {
             success("\nClosing the sql console...\n");
             break;
+        } else if(!strcmp(sql, "help")) {
+            success("%-86s %s\n", "create database [DATABASE]", "create a database");
+            success("%-86s %s\n", "drop database [DATABASE]", "completely delete a database and everything in it");
+            success("%-86s %s\n", "create table [DATABASE.TABLE] [ARGUMENTS]", "create a table");
+            success("%-86s %s\n", "drop table [DATABASE.TABLE]", "permanently delete a table");
+            success("%-86s %s\n", "insert into [DATABASE.TABLE] values [ARGUMENTS]", "add records to a table");
+            success("%-86s %s\n", "update [DATABASE.TABLE] set [KEY] = [VALUE] [where [KEY] [OPERATOR] [VALUE]]", "make changes to existing rows in a table");
+            success("%-86s %s\n", "delete from [DATABASE.TABLE] [where [KEY] [OPERATOR] [VALUE]]", "delete rows from a table");
+            success("%-86s %s\n", "select [ARGUMENTS] from [DATABASE.TABLE] [where [KEY] [OPERATOR] [VALUE]]", "retrieve data from a table");
+            success("%-86s %s\n", "select [ARGUMENTS] from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = [DATABASE.TABLE]", "get information about all columns (TABLE_NAME / COLUMN_NAME / DATA_TYPE)");
+            success("%-86s %s\n", "help", "display information about the SQL console");
+            success("%-86s %s\n", "exit", "exit SQL console");
+
+            continue;
         }
 
         parser.sql(sql, &tree);
