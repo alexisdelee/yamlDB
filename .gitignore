@@ -27,7 +27,7 @@
 **/*.lo
 
 # Shared objects (inc. Windows DLLs)
-**/*.dll
+# **/*.dll
 **/*.so
 **/*.so.*
 **/*.dylib
@@ -61,3 +61,4 @@
 **/obj/
 docs/*
 !docs/rapport.docx
+Services/manager/manager.cbp

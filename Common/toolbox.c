@@ -113,13 +113,13 @@ char *env()
     char *homedir = NULL;
     static char yamldir[256];
 
-    if((homedir = getenv("~")) == NULL && (homedir = getenv("HOMEPATH")) == NULL) {
+    /* if((homedir = getenv("~")) == NULL && (homedir = getenv("HOMEPATH")) == NULL) {
         danger(true, "Exception: the environment variable ~ or HOMEPATH is not configure\n");
     }
 
-    sprintf(yamldir, "%s\\.yaml", homedir);
+    sprintf(yamldir, "%s\\.yaml", homedir); */
 
-    // sprintf(yamldir, "C:\\Users\\adelee\\.yaml");
+    sprintf(yamldir, "C:\\Users\\adelee\\.yaml");
     return yamldir;
 }
 
@@ -197,4 +197,17 @@ int contains(char *value, char **values, int size)
     }
 
     return -1;
+}
+
+void freeToken(Token *token)
+{
+    int i;
+
+    for(i = 0; i < token->size; i++) {
+        if(token->data[i]) {
+            free(token->data[i]);
+        }
+    }
+
+    free(token->data);
 }

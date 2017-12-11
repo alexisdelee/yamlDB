@@ -42,5 +42,6 @@ Path pathParse(char *, char *);
 unsigned int _typeOf(char *);
 int _isTypeOf(char *, int);
 int contains(char *, char **, int);
+void freeToken(Token *);
 
 #endif // TOOLBOX_H_INCLUDED
