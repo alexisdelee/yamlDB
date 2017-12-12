@@ -17,7 +17,7 @@ Settings getSettings()
     int size;
 
     if((conf = fopen("yaml.conf", "r")) == false) {
-        danger(true, "Exception: non-existent configuration file (yaml.conf)\n");
+        return settings;
     }
 
     while(fgets(line, 1001, conf)) {

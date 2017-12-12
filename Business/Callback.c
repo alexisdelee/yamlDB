@@ -12,17 +12,17 @@
 TableStatement tableStatementInit();
 DatabaseStatement databaseStatementInit();
 
-void createDatabaseFunc(char *, void *);
-void dropDatabaseFunc(char *, void *);
-void createTableFunc(char *, void *);
-void dropTableFunc(char *, void *);
-void insertTableFunc(char *, void *);
-void updateTableFunc(char *, void *);
-void deleteTableFunc(char *, void *);
-void selectTableFunc(char *, void *);
-void selectWhereTableFunc(char *, void *);
-void displaySelectResults(Entity *, Stack *);
-void informationTableFunc(char *, void *);
+void *createDatabaseFunc(char *, void *);
+void *dropDatabaseFunc(char *, void *);
+void *createTableFunc(char *, void *);
+void *dropTableFunc(char *, void *);
+void *insertTableFunc(char *, void *);
+void *updateTableFunc(char *, void *);
+void *deleteTableFunc(char *, void *);
+void *selectTableFunc(char *, void *);
+void *selectWhereTableFunc(char *, void *);
+void displaySelectResults(Entity *, Stack *, Throw *);
+void *informationTableFunc(char *, void *);
 void displayInformationResults(Entity *, Stack *, Token *);
 
 TableStatement tableStatementInit()
@@ -63,29 +63,29 @@ Callback callbackInit()
 
 // callbacks: privates methods
 
-void createDatabaseFunc(char *s, void *_parameters)
+void *createDatabaseFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
 
     Throw *err = (Throw *)yaml.database.create(parameters->data[0]);
-    printStackError(err, debug);
+    // printStackError(err, debug);
 
-    free(err);
+    return err;
 }
 
-void dropDatabaseFunc(char *s, void *_parameters)
+void *dropDatabaseFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
 
     Throw *err = (Throw *)yaml.database.drop(parameters->data[0]);
-    printStackError(err, debug);
+    // printStackError(err, debug);
 
-    free(err);
+    return err;
 }
 
-void createTableFunc(char *s, void *_parameters)
+void *createTableFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
@@ -95,10 +95,9 @@ void createTableFunc(char *s, void *_parameters)
 
     if((parameters->size - 2) % 2 != 0) {
         err = setError("Exception: create table xxx (int xxx, real xxx, char xxx, varchar xxx)");
-        printStackError(err, debug);
+        // printStackError(err, debug);
 
-        if(err != NULL) free(err);
-        return;
+        return err;
     }
 
     for(i = 2; i < parameters->size; i += 2) {
@@ -112,31 +111,32 @@ void createTableFunc(char *s, void *_parameters)
             entity->_.initializer(entity, YAML_STRING, parameters->data[i]);
         } else {
             err = setError("Exception: create table xxx (xxx int, xxx real, xxx char, xxx varchar)");
-            printStackError(err, debug);
+            // printStackError(err, debug);
 
-            break;
+            freeEntity(entity);
+            return err;
         }
     }
 
     err = (Throw *)yaml.table.create(parameters->data[0], parameters->data[1], entity);
-    printStackError(err, debug);
+    // printStackError(err, debug);
 
     freeEntity(entity);
-    free(err);
+    return err;
 }
 
-void dropTableFunc(char *s, void *_parameters)
+void *dropTableFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
 
     Throw *err = (Throw *)yaml.table.drop(parameters->data[0], parameters->data[1]);
-    printStackError(err, debug);
+    // printStackError(err, debug);
 
-    free(err);
+    return err;
 }
 
-void insertTableFunc(char *s, void *_parameters)
+void *insertTableFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
@@ -146,12 +146,10 @@ void insertTableFunc(char *s, void *_parameters)
 
     err = (Throw *)yaml.table.load(parameters->data[0], parameters->data[1], entity);
     if(err->err) {
-        printStackError(err, debug);
+        // printStackError(err, debug);
 
         freeEntity(entity);
-        if(err != NULL) free(err);
-
-        return;
+        return err;
     }
 
     if(parameters->size > 2) {
@@ -163,14 +161,14 @@ void insertTableFunc(char *s, void *_parameters)
         }
 
         err = (Throw *)yaml.table.insert(parameters->data[0], parameters->data[1], entity);
-        printStackError(err, debug);
+        // printStackError(err, debug);
     }
 
     freeEntity(entity);
-    free(err);
+    return err;
 }
 
-void updateTableFunc(char *s, void *_parameters)
+void *updateTableFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
@@ -179,12 +177,10 @@ void updateTableFunc(char *s, void *_parameters)
 
     err = (Throw *)yaml.table.load(parameters->data[0], parameters->data[1], entity);
     if(err->err) {
-        printStackError(err, debug);
+        // printStackError(err, debug);
 
         freeEntity(entity);
-        if(err != NULL) free(err);
-
-        return;
+        return err;
     }
 
     if(err != NULL) free(err);
@@ -195,15 +191,15 @@ void updateTableFunc(char *s, void *_parameters)
         err = (Throw *)yaml.table.update(parameters->data[0], parameters->data[1], entity, parameters->data[2], parameters->data[3], "@", "", "");
     }
 
-    if(err->err) {
+    /* if(err->err) {
         printStackError(err, debug);
-    }
+    } */
 
     freeEntity(entity);
-    if(err != NULL) free(err);
+    return err;
 }
 
-void deleteTableFunc(char *s, void *_parameters)
+void *deleteTableFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
@@ -212,12 +208,10 @@ void deleteTableFunc(char *s, void *_parameters)
 
     err = (Throw *)yaml.table.load(parameters->data[0], parameters->data[1], entity);
     if(err->err) {
-        printStackError(err, debug);
+        // printStackError(err, debug);
 
         freeEntity(entity);
-        if(err != NULL) free(err);
-
-        return;
+        return err;
     }
 
     if(err != NULL) free(err);
@@ -228,15 +222,15 @@ void deleteTableFunc(char *s, void *_parameters)
         err = (Throw *)yaml.table.delete(parameters->data[0], parameters->data[1], entity, "@", "", "");
     }
 
-    if(err->err) {
+    /* if(err->err) {
         printStackError(err, debug);
-    }
+    } */
 
     freeEntity(entity);
-    if(err != NULL) free(err);
+    return err;
 }
 
-void selectWhereTableFunc(char *s, void *_parameters)
+void *selectWhereTableFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
@@ -248,7 +242,7 @@ void selectWhereTableFunc(char *s, void *_parameters)
 
     err = (Throw *)yaml.table.load(parameters->data[parameters->size - 5], parameters->data[parameters->size - 4], entity);
     if(err->err) {
-        printStackError(err, debug);
+        // printStackError(err, debug);
     } else {
         statement.size = 0;
 
@@ -261,9 +255,9 @@ void selectWhereTableFunc(char *s, void *_parameters)
         free(err);
         err = (Throw *)yaml.table.select(parameters->data[parameters->size - 5], parameters->data[parameters->size - 4], entity, (void **)(&stack), statement);
         if(err->err) {
-            printStackError(err, debug);
+            // printStackError(err, debug);
         } else {
-            displaySelectResults(entity, stack);
+            displaySelectResults(entity, stack, err);
             destroyStack(stack);
         }
 
@@ -271,10 +265,10 @@ void selectWhereTableFunc(char *s, void *_parameters)
     }
 
     freeEntity(entity);
-    free(err);
+    return err;
 }
 
-void selectTableFunc(char *s, void *_parameters)
+void *selectTableFunc(char *s, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
@@ -286,7 +280,7 @@ void selectTableFunc(char *s, void *_parameters)
 
     err = (Throw *)yaml.table.load(parameters->data[parameters->size - 2], parameters->data[parameters->size - 1], entity);
     if(err->err) {
-        printStackError(err, debug);
+        // printStackError(err, debug);
     } else {
         statement.size = 0;
 
@@ -299,9 +293,9 @@ void selectTableFunc(char *s, void *_parameters)
         free(err);
         err = (Throw *)yaml.table.select(parameters->data[parameters->size - 2], parameters->data[parameters->size - 1], entity, (void **)(&stack), statement);
         if(err->err) {
-            printStackError(err, debug);
+            // printStackError(err, debug);
         } else {
-            displaySelectResults(entity, stack);
+            displaySelectResults(entity, stack, err);
             destroyStack(stack);
         }
 
@@ -309,10 +303,10 @@ void selectTableFunc(char *s, void *_parameters)
     }
 
     freeEntity(entity);
-    free(err);
+    return err;
 }
 
-void displaySelectResults(Entity *entity, Stack *stack)
+void displaySelectResults(Entity *entity, Stack *stack, Throw *err)
 {
     int i, j, id;
 
@@ -321,26 +315,30 @@ void displaySelectResults(Entity *entity, Stack *stack)
             for(j = 0; j < stack->indexed[i].size; j++) {
                 id = stack->indexed[i].ids[j];
                 if(!j) {
-                    success("<\"%s\">", entity->core[i]->id);
+                    // success("<\"%s\">", entity->core[i]->id);
+                    sprintf(err->output, "%s<\"%s\">", err->output, entity->core[i]->id);
                 }
 
                 if(!(entity->header->type[j] & YAML_UNDEFINED)) {
                     if(strcspn(entity->core[i]->data[id], " ") == strlen(entity->core[i]->data[id])) {
-                        success(" %s", entity->core[i]->data[id]);
+                        // success(" %s", entity->core[i]->data[id]);
+                        sprintf(err->output, "%s %s", err->output, entity->core[i]->data[id]);
                     } else {
-                        success(" \"%s\"", entity->core[i]->data[id]);
+                        // success(" \"%s\"", entity->core[i]->data[id]);
+                        sprintf(err->output, "%s \"%s\"", err->output, entity->core[i]->data[id]);
                     }
                 }
 
                 if(j == stack->indexed[i].size - 1) {
-                    success("\n");
+                    // success("\n");
+                    sprintf(err->output, "%s\n", err->output);
                 }
             }
         }
     }
 }
 
-void informationTableFunc(char *z, void *_parameters)
+void *informationTableFunc(char *z, void *_parameters)
 {
     Token *parameters = (Token *)_parameters;
     Yaml yaml = yamlInit();
@@ -351,7 +349,7 @@ void informationTableFunc(char *z, void *_parameters)
 
     err = (Throw *)yaml.table.load(parameters->data[parameters->size - 2], parameters->data[parameters->size - 1], entity);
     if(err->err) {
-        printStackError(err, debug);
+        // printStackError(err, debug);
     } else {
         statement.size = 0;
 
@@ -361,7 +359,7 @@ void informationTableFunc(char *z, void *_parameters)
         free(err);
         err = (Throw *)yaml.table.select(parameters->data[parameters->size - 2], parameters->data[parameters->size - 1], entity, (void **)(&stack), statement);
         if(err->err) {
-            printStackError(err, debug);
+            // printStackError(err, debug);
         } else {
             displayInformationResults(entity, stack, parameters);
             destroyStack(stack);
@@ -371,7 +369,7 @@ void informationTableFunc(char *z, void *_parameters)
     }
 
     freeEntity(entity);
-    free(err);
+    return err;
 }
 
 void displayInformationResults(Entity *entity, Stack *stack, Token *parameters)

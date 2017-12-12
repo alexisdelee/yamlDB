@@ -19,6 +19,7 @@ Throw *_setError(char *file, int line, char *format, ...)
     err->err = true;
     err->line = line;
     sprintf(err->file, "%s", file);
+    sprintf(err->output, "%s", "");
 
     va_start(arglist, format);
     vsprintf(err->message, format, arglist);

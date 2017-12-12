@@ -81,7 +81,14 @@ int main(int argc, char **argv)
             continue;
         }
 
-        parser.sql(sql, &tree);
+        Throw *err = parser.sql(sql, &tree);
+        if(err->err) {
+            printStackError(err, debug);
+        } else {
+            success(err->output);
+        }
+
+        free(err);
     }
 
     free(sql);

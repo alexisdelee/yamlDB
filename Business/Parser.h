@@ -10,13 +10,13 @@ struct Node
 	char type[256];
 	int size;
 	struct Node **next;
-	void (*callback)(char *, void *);
+	void *(*callback)(char *, void *);
 };
 
 typedef struct
 {
-    void (*build)(char *, Node **, void (*callback)(char *, void *));
-    void (*sql)(char *, Node **);
+    void (*build)(char *, Node **, void *(*callback)(char *, void *));
+    void *(*sql)(char *, Node **);
     void (*statistic)(Node *, int);
 } Parser;
 

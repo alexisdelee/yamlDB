@@ -10,6 +10,7 @@ typedef struct
     char message[256];
     char file[256];
     int line;
+    char output[10001];
 } Throw;
 
 Throw *_setError(char *, int, char *, ...);

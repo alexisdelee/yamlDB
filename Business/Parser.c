@@ -9,8 +9,8 @@
 #include "../Common/colorShell.h"
 #include "Parser.h"
 
-void build(char *, Node **, void (*callback)(char *, void *));
-void search(char *, Node **);
+void build(char *, Node **, void *(*callback)(char *, void *));
+void *search(char *, Node **);
 void statistic(Node *, int);
 void parseArguments(void *, char *);
 Token *_split(char *);
@@ -54,7 +54,7 @@ Node *initNode(char *data, char *type)
 /// <param name="s">commande</param>
 /// <param name="tree">arbre</param>
 /// <param name="callback">fonction de callback a appele dans le cas ou la commande emise dans la fonction <see cref="search">search</see> est reconnue</param>
-void build(char *s, Node **tree, void (*callback)(char *, void *))
+void build(char *s, Node **tree, void *(*callback)(char *, void *))
 {
 	Token *token = _split(s);
 	Node *seed = *tree;
@@ -99,11 +99,12 @@ void build(char *s, Node **tree, void (*callback)(char *, void *))
 /// </summary>
 /// <param name="s">source</param>
 /// <param name="tree">arbre</param>
-void search(char *s, Node **tree)
+void *search(char *s, Node **tree)
 {
 	Token *token = _split(s);
 	Token parameters;
 	Node *seed = *tree;
+	Throw *err;
 	int active, i, j;
 
 	parameters.data = NULL;
@@ -135,7 +136,7 @@ void search(char *s, Node **tree)
 
 	if(active && (seed->next == NULL || seed->callback)) {
 		if(seed->callback) {
-			seed->callback(s, &parameters);
+			err = seed->callback(s, &parameters);
 		}
 
 		for(i = 0; i < parameters.size; i++) {
@@ -143,8 +144,10 @@ void search(char *s, Node **tree)
 		}
 
 		free(parameters.data);
+		return err;
 	} else {
-		printStackError((Throw *)setError("\"%s\" is not recognised as an internal command", s), debug);
+		// printStackError((Throw *)setError("\"%s\" is not recognised as an internal command", s), debug);
+		return setError("\"%s\" is not recognised as an internal command", s);
 	}
 }
 

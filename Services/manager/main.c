@@ -1,7 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gtk/gtk.h>
-#include "../yamlBddGraphique.h"
+
+#include "../../Common/toolbox.h"
+#include "../../Common/throw.h"
+#include "../../Common/settings.h"
+#include "../../Common/Interface.h"
+#include "../../Common/colorShell.h"
+#include "../../Business/Parser.h"
+#include "../../Business/Callback.h"
+#include "../graphical.h"
+
+int ansiSupport;
+int debug;
 
 int main (int argc, char **argv)
 {
@@ -11,7 +22,12 @@ int main (int argc, char **argv)
     GtkWidget *textArea = NULL;
     GtkWidget *textAreaResult = NULL;
     GtkWidget *buttonLaunch = NULL;
+
+    Settings settings = getSettings();
     Data data;
+    data.settings = &settings;
+
+    // printf("%d\n", ((Settings *)data.settings)->allowColor);
 
     // initialisation des composants et création de la fenêtre
     gtk_init(&argc, &argv);

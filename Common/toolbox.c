@@ -113,13 +113,12 @@ char *env()
     char *homedir = NULL;
     static char yamldir[256];
 
-    /* if((homedir = getenv("~")) == NULL && (homedir = getenv("HOMEPATH")) == NULL) {
+    if((homedir = getenv("~")) == NULL && (homedir = getenv("HOMEPATH")) == NULL) {
         danger(true, "Exception: the environment variable ~ or HOMEPATH is not configure\n");
     }
 
-    sprintf(yamldir, "%s\\.yaml", homedir); */
+    sprintf(yamldir, "%s\\.yaml", homedir);
 
-    sprintf(yamldir, "C:\\Users\\adelee\\.yaml");
     return yamldir;
 }
 
