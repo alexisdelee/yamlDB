@@ -9,9 +9,11 @@ void callback_resultQuery(GtkWidget *buttonLaunch, gpointer data);
 
 typedef struct
 {
-    void *settings;
     GtkTextBuffer *queryResult;
     GtkTextBuffer *queryRecuperator;
+    GtkWidget *inputArea;
+    GtkWidget *outputArea;
+    GtkWidget *window;
 } Data;
 
 #endif // YAMLBDDGRAPHIQUE_H_INCLUDED

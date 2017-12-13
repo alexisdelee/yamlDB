@@ -84,6 +84,7 @@ void quit(GtkWidget *window, gpointer data){
 void callback_resultQuery(GtkWidget *buttonLaunch, void *data) { // gpointer data){
     char *text;
     GtkTextIter start, end; // pointeurs sur la fin et le début du texte
+    GtkStyleContext *context = gtk_widget_get_style_context(((Data *)data)->outputArea);
 
     gtk_text_buffer_get_bounds(((Data *)data)->queryRecuperator, &start, &end); // récupère le début et la fin de la chaine
     text = gtk_text_buffer_get_text(((Data *)data)->queryRecuperator, &start, &end, FALSE);
@@ -91,13 +92,18 @@ void callback_resultQuery(GtkWidget *buttonLaunch, void *data) { // gpointer dat
     Throw *err = interpreter(text);
     if(err) {
         if(err->err) {
-        gtk_text_buffer_set_text(((Data *)data)->queryResult, (gchar*)err->message, -1);
+            gtk_text_buffer_set_text(((Data *)data)->queryResult, (gchar *)err->message, -1);
+            gtk_style_context_add_class(context, "error"); // ajout de la classe "error"
         } else {
-            gtk_text_buffer_set_text(((Data *)data)->queryResult, (gchar*)err->output, -1);
+            gtk_text_buffer_set_text(((Data *)data)->queryResult, (gchar *)err->output, -1);
+            gtk_text_buffer_set_text(((Data *)data)->queryRecuperator, (gchar *)(""), -1); // on vide le champs uniquement si la commande est reconnue
+            gtk_style_context_remove_class(context, "error"); // suppression de la classe "error"
         }
 
         free(err);
     }
+
+    gtk_window_set_focus(GTK_WINDOW(((Data *)data)->window), ((Data *)data)->inputArea); // focus lors du démarrage de l'application
 
     _safeFree(&text);
 }
