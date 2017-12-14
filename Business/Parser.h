@@ -23,5 +23,6 @@ typedef struct
 Parser parserInit();
 Node *initNode(char *, char *);
 void freeTree(Node *);
+char *cheatForSelect(char *);
 
 #endif // PARSER_H_INCLUDED

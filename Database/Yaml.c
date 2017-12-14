@@ -85,6 +85,7 @@ int _isDatabase(char *databaseName)
 void *yamlDatabaseCreate(char *dbName)
 {
     Path path = pathParse(NULL, dbName);
+    Throw *err;
     int status;
 
     if(_isDatabase(path.dir) == true) {
@@ -96,12 +97,15 @@ void *yamlDatabaseCreate(char *dbName)
         return (void *)setError("Exception: unknown error");
     }
 
-    return (void *)setSuccess("Database \"%s\" was created", dbName);
+    err = setSuccess("");
+    sprintf(err->output, "Database \"%s\" was created", dbName);
+    return (void *)err;
 }
 
 void *yamlDatabaseDrop(char *dbName)
 {
     Path path = pathParse(NULL, dbName);
+    Throw *err;
     int status;
 
     if(_isDatabase(path.dir) == false) {
@@ -113,7 +117,9 @@ void *yamlDatabaseDrop(char *dbName)
         return (void *)setError("Exception: unknown error");
     }
 
-    return (void *)setSuccess("Database \"%s\" was deleted", dbName);
+    err = setSuccess("");
+    sprintf(err->output, "Database \"%s\" was deleted", dbName);
+    return (void *)err;
 }
 
 // tables: privates methods
@@ -151,6 +157,7 @@ void *yamlTableCreate(char *dbName, char *tableName, void *_entity)
 {
     Path path = pathParse(tableName, dbName);
     Entity *entity = (Entity *)_entity;
+    Throw *err;
 
     if(_isDatabase(path.dir) == false) {
         return (void *)setError("Exception: a database with this name does not exist");
@@ -164,20 +171,27 @@ void *yamlTableCreate(char *dbName, char *tableName, void *_entity)
 		return (void *)setError("Exception: unknown error");
 	}
 
-    return (void *)setSuccess("Table \"%s\" was created", tableName);
+    err = setSuccess("");
+    sprintf(err->output, "Table \"%s\" was created", tableName);
+    return (void *)err;
 }
 
 void *yamlTableInsert(char *dbName, char *tableName, void *_entity)
 {
     Path path = pathParse(tableName, dbName);
     Entity *entity = (Entity *)_entity;
+    Throw *err;
 
-    Throw *err = (Throw *)entity->_.commit(path.path, NULL, entity->core[entity->length - 1]);
+    err = (Throw *)entity->_.commit(path.path, NULL, entity->core[entity->length - 1]);
     if(err->err) {
         return (void *)err;
     }
 
-    return (void *)setSuccess("New line was added in the table \"%s\"", tableName);
+    free(err);
+
+    err = setSuccess("");
+    sprintf(err->output, "New line was added in the table \"%s\"", tableName);
+    return (void *)err;
 }
 
 void *yamlTableSelect(char *dbName, char *tableName, void *_entity, void **_stack, SelectStatement statement)
@@ -232,6 +246,7 @@ void *yamlTableUpdate(char *dbName, char *tableName, void *_entity, char *valueA
     Entity *entity = (Entity *)_entity;
     Stack *stack = NULL;
     SelectStatement statement;
+    Throw *err;
     int i, j;
 
     if((i = contains(valueA, entity->header->data, entity->header->size)) == -1) {
@@ -241,14 +256,16 @@ void *yamlTableUpdate(char *dbName, char *tableName, void *_entity, char *valueA
     statement.size = 0;
     addStatement(&statement, valueA);
     whereStatement(&statement, operator, valueC, valueD);
-    Throw *err = (Throw *)yamlTableSelect(dbName, tableName, entity, (void **)(&stack), statement);
+    err = (Throw *)yamlTableSelect(dbName, tableName, entity, (void **)(&stack), statement);
 
     if(!err->err) {
+        free(err);
+
         for(i = 0; i < stack->size; i++) {
             if(stack->indexed[i].active == NULL) {
                 for(j = 0; j < stack->indexed[i].size; j++) {
                     entity->_.set(entity, i, stack->indexed[i].ids[j], valueB);
-                    success("Line #%s was updated in the table \"%s\"\n", entity->core[i]->id, tableName);
+                    sprintf(err->output, "%sLine #%s was updated in the table \"%s\"\n", err->output, entity->core[i]->id, tableName);
                 }
             }
         }
@@ -261,7 +278,7 @@ void *yamlTableUpdate(char *dbName, char *tableName, void *_entity, char *valueA
     }
 
     freeStatement(&statement);
-    return (void *)setSuccess("");
+    return err;
 }
 
 void *yamlTableDelete(char *dbName, char *tableName, void *_entity, char *operator, char *valueA, char *valueB)
@@ -270,18 +287,21 @@ void *yamlTableDelete(char *dbName, char *tableName, void *_entity, char *operat
     Entity *entity = (Entity *)_entity;
     Stack *stack;
     SelectStatement statement;
+    Throw *err;
     int i;
 
     statement.size = 0;
     addStatement(&statement, "*");
     whereStatement(&statement, operator, valueA, valueB);
-    Throw *err = (Throw *)yamlTableSelect(dbName, tableName, entity, (void **)(&stack), statement);
+    err = (Throw *)yamlTableSelect(dbName, tableName, entity, (void **)(&stack), statement);
 
     if(!err->err) {
+        free(err);
+
         for(i = 0; i < stack->size; i++) {
             if(stack->indexed[i].active == NULL && stack->indexed[i].size) {
                 entity->core[i]->status = 'D';
-                success("Line #%s was deleted in the table \"%s\"\n", entity->core[i]->id, tableName);
+                sprintf(err->output, "%sLine #%s was deleted in the table \"%s\"\n", err->output, entity->core[i]->id, tableName);
             }
         }
 
@@ -293,7 +313,7 @@ void *yamlTableDelete(char *dbName, char *tableName, void *_entity, char *operat
     }
 
     freeStatement(&statement);
-    return (void *)setSuccess("");
+    return err;
 }
 
 // debug

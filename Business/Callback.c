@@ -167,9 +167,9 @@ void *updateTableFunc(char *s, void *_parameters)
     if(err != NULL) free(err);
 
     if(parameters->size == 7) { // where statement
-        err = (Throw *)yaml.table.update(parameters->data[0], parameters->data[1], entity, parameters->data[2], parameters->data[3], parameters->data[5], parameters->data[4], parameters->data[6]);
+        err = yaml.table.update(parameters->data[0], parameters->data[1], entity, parameters->data[2], parameters->data[3], parameters->data[5], parameters->data[4], parameters->data[6]);
     } else {
-        err = (Throw *)yaml.table.update(parameters->data[0], parameters->data[1], entity, parameters->data[2], parameters->data[3], "@", "", "");
+        err = yaml.table.update(parameters->data[0], parameters->data[1], entity, parameters->data[2], parameters->data[3], "@", "", "");
     }
 
     freeEntity(entity);
@@ -192,9 +192,9 @@ void *deleteTableFunc(char *s, void *_parameters)
     if(err != NULL) free(err);
 
     if(parameters->size == 5) { // where statement
-        err = (Throw *)yaml.table.delete(parameters->data[0], parameters->data[1], entity, parameters->data[3], parameters->data[2], parameters->data[4]);
+        err = yaml.table.delete(parameters->data[0], parameters->data[1], entity, parameters->data[3], parameters->data[2], parameters->data[4]);
     } else {
-        err = (Throw *)yaml.table.delete(parameters->data[0], parameters->data[1], entity, "@", "", "");
+        err = yaml.table.delete(parameters->data[0], parameters->data[1], entity, "@", "", "");
     }
 
     freeEntity(entity);

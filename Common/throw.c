@@ -40,6 +40,7 @@ Throw *_setSuccess(char *file, int line, char *format, ...)
     err->err = false;
     err->line = line;
     sprintf(err->file, "%s", file);
+    sprintf(err->output, "%s", "");
 
     va_start(arglist, format);
     vsprintf(err->message, format, arglist);

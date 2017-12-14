@@ -468,3 +468,28 @@ int regexp(char *rgx, char *str, void *_parameters)
 
 	return false;
 }
+
+char *cheatForSelect(char *str)
+{
+    char *alternative = malloc(sizeof(char) * (strlen(str) + 3));
+    char *fromStatement = NULL;
+    int lowercase = true;
+
+    if(alternative && (strstr(str, "select ") || strstr(str, "SELECT "))) {
+        if((fromStatement = strstr(str, " from")) == NULL) {
+            if((fromStatement = strstr(str, " FROM")) == NULL) {
+                return str;
+            }
+
+            lowercase = false;
+        }
+
+        alternative[0] = '\0';
+        sprintf(alternative, "%s (%.*s)%s", lowercase ? "select" : "SELECT", fromStatement - str - 7, str + 7, fromStatement);
+
+        free(str);
+        str = alternative;
+    }
+
+    return str;
+}

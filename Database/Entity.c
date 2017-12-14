@@ -210,7 +210,7 @@ void *loadYaml(void *_entity, char *tablePath)
 {
     Entity *entity = (Entity *)_entity;
     FILE *tableFile = NULL;
-    char data[501];
+    char data[1001];
     int index = 0;
     int size;
 
@@ -219,7 +219,7 @@ void *loadYaml(void *_entity, char *tablePath)
         return (void *)setError("Exception: error with table file");
     }
 
-    while(fgets(data, 501, tableFile) != NULL) {
+    while(fgets(data, 1001, tableFile) != NULL) {
         size = strlen(data);
         if(data[size - 1] == '\n') {
             data[size - 1] = '\0';

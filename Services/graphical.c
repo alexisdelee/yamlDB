@@ -68,6 +68,7 @@ Throw *interpreter(char *sql)
         sprintf(err->output, "%s%-86s %s\n", err->output, "help", "display information about the SQL console");
         sprintf(err->output, "%s%-86s %s\n", err->output, "exit", "exit SQL console");
     } else {
+        sql = cheatForSelect(sql);
         err = parser.sql(sql, &tree);
     }
 
@@ -100,6 +101,7 @@ void callback_resultQuery(GtkWidget *buttonLaunch, void *data) { // gpointer dat
             gtk_style_context_remove_class(context, "error"); // suppression de la classe "error"
         }
 
+        strcpy(err->output, "");
         free(err);
     }
 

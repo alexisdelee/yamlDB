@@ -19,6 +19,7 @@ int main(int argc, char **argv)
     Parser parser = parserInit();
     Callback callback = callbackInit();
     Interface interface = interfaceInit();
+    Throw *err = NULL;
     char *sql = NULL;
 
     Settings settings = getSettings();
@@ -81,13 +82,16 @@ int main(int argc, char **argv)
             continue;
         }
 
-        Throw *err = parser.sql(sql, &tree);
+        sql = cheatForSelect(sql);
+        err = (Throw *)parser.sql(sql, &tree);
+
         if(err->err) {
             printStackError(err, debug);
         } else {
             success(err->output);
         }
 
+        strcpy(err->output, "");
         free(err);
     }
 
