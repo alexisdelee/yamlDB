@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="manager" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/manager" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/manager" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../../Common/Interface.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Common/Interface.h" />
+		<Unit filename="../../Common/colorShell.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Common/colorShell.h" />
+		<Unit filename="../../Common/settings.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Common/settings.h" />
+		<Unit filename="../../Common/throw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Common/throw.h" />
+		<Unit filename="../../Common/toolbox.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Common/toolbox.h" />
+		<Unit filename="../../Database/Engine.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Database/Engine.h" />
+		<Unit filename="../../Database/Entity.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Database/Entity.h" />
+		<Unit filename="../../Database/Yaml.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../Database/Yaml.h" />
+		<Unit filename="../Callback.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Callback.h" />
+		<Unit filename="../Parser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Parser.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

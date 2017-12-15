@@ -3,61 +3,61 @@
 
 ### C ###
 # Prerequisites
-**/*.d
+source/**/*.d
 
 # Object files
-**/*.o
-**/*.ko
-**/*.obj
-**/*.elf
+source/**/*.o
+source/**/*.ko
+source/**/*.obj
+source/**/*.elf
 
 # Linker output
-**/*.ilk
-**/*.map
-**/*.exp
+source/**/*.ilk
+source/**/*.map
+source/**/*.exp
 
 # Precompiled Headers
-**/*.gch
-**/*.pch
+source/**/*.gch
+source/**/*.pch
 
 # Libraries
-**/*.lib
-**/*.a
-**/*.la
-**/*.lo
+source/**/*.lib
+source/**/*.a
+source/**/*.la
+source/**/*.lo
 
 # Shared objects (inc. Windows DLLs)
-# **/*.dll
-**/*.so
-**/*.so.*
-**/*.dylib
+# source/**/*.dll
+source/**/*.so
+source/**/*.so.*
+source/**/*.dylib
 
 # Executables
-**/*.exe
-**/*.out
-**/*.app
-**/*.i*86
-**/*.x86_64
-**/*.hex
+source/**/*.exe
+source/**/*.out
+source/**/*.app
+source/**/*.i*86
+source/**/*.x86_64
+source/**/*.hex
 
 # Debug files
-**/*.dSYM/
-**/*.su
-**/*.idb
-**/*.pdb
+source/**/*.dSYM/
+source/**/*.su
+source/**/*.idb
+source/**/*.pdb
 
 # Kernel Module Compile Results
-**/*.mod*
-**/*.cmd
-**/.tmp_versions/
-**/modules.order
-**/Module.symvers
-**/Mkfile.old
-**/dkms.conf
+source/**/*.mod*
+source/**/*.cmd
+source/**/.tmp_versions/
+source/**/modules.order
+source/**/Module.symvers
+source/**/Mkfile.old
+source/**/dkms.conf
 
 # End of https://www.gitignore.io/api/c
 
-**/bin/
-**/obj/
+source/**/bin/
+source/**/obj/
 docs/*
 !docs/rapport.docx
