@@ -472,5 +472,7 @@ void *yamlTableDrop(char *dbName, char *tableName)
         }
     }
 
-    return (void *)setSuccess("Table \"%s\" was deleted", tableName);
+    Throw *err = setSuccess("");
+    sprintf(err->output, "Table \"%s\" was deleted", tableName);
+    return (void *)err;
 }

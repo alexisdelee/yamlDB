@@ -97,7 +97,13 @@ void createDatabaseOption()
 
     char *database = interface.input("database> ");
     Throw *err = (Throw *)yaml.database.create(database);
-    printStackError(err, debug);
+
+    if(err->err) {
+        printStackError(err, debug);
+    } else {
+        strcat(err->output, "\n");
+        success(err->output);
+    }
 
     _safeFree(&database);
     free(err);
@@ -110,7 +116,13 @@ void dropDatabaseOption()
 
     char *database = interface.input("database> ");
     Throw *err = (Throw *)yaml.database.drop(database);
-    printStackError(err, debug);
+
+    if(err->err) {
+        printStackError(err, debug);
+    } else {
+        strcat(err->output, "\n");
+        success(err->output);
+    }
 
     _safeFree(&database);
     free(err);
@@ -156,7 +168,14 @@ void addTableOption()
 
     if(status) {
         Throw *err = (Throw *)yaml.table.create(database, table, entity);
-        printStackError(err, debug);
+
+        if(err->err) {
+            printStackError(err, debug);
+        } else {
+            strcat(err->output, "\n");
+            success(err->output);
+        }
+
         free(err);
     }
 
@@ -197,7 +216,13 @@ void insertTableOption()
 
         free(err);
         err = yaml.table.insert(database, table, entity);
-        printStackError(err, debug);
+
+        if(err->err) {
+            printStackError(err, debug);
+        } else {
+            strcat(err->output, "\n");
+            success(err->output);
+        }
     }
 
     freeEntity(entity);
@@ -255,23 +280,59 @@ void selectTableOption()
         if(err->err) {
             printStackError(err, debug);
         } else {
-            for(i = 0; i < stack->size; i++) {
-                if(stack->indexed[i].active == NULL) {
+            /* for(i = 0; i < stack->size; i++) {
+                if(stack->indexed[i].active == true) {
                     for(j = 0; j < stack->indexed[i].size; j++) {
                         id = stack->indexed[i].ids[j];
                         if(!j) {
-                            printf("id:%s => { ", entity->core[i]->id);
+                            sprintf(err->output, "%sid:%s => { ", err->output, entity->core[i]->id);
                         }
 
                         if(!(entity->header->type[j] & YAML_UNDEFINED)) {
-                            printf("\n%2svalue: \"%s\", type: \"%s\"", "", entity->core[i]->data[id], entity->header->type[id] & YAML_INTEGER ? "int" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "varchar")));
+                            sprintf(err->output, "%s\n%2svalue: \"%s\", type: \"%s\"", "", err->output, entity->core[i]->data[id], entity->header->type[id] & YAML_INTEGER ? "int" : (entity->header->type[id] & YAML_REAL ? "real" : (entity->header->type[id] & YAML_CHARACTER ? "char" : "varchar")));
                         }
 
                         if(j == stack->indexed[i].size - 1) {
-                            printf("\n}\n");
+                            sprintf(err->output, "%s\n}\n", err->output);
                         }
                     }
                 }
+            }
+
+            if(err->err) {
+                printStackError(err, debug);
+            } else {
+                strcat(err->output, "\n");
+                success(err->output);
+            } */
+
+            for(i = 0; i < stack->size; i++) {
+                if(stack->indexed[i].active == true) {
+                    for(j = 0; j < stack->indexed[i].size; j++) {
+                        id = stack->indexed[i].ids[j];
+                        if(!j) {
+                            sprintf(err->output, "%s<\"%s\">", err->output, entity->core[i]->id);
+                        }
+
+                        if(!(entity->header->type[j] & YAML_UNDEFINED)) {
+                            if(strcspn(entity->core[i]->data[id], " ") == strlen(entity->core[i]->data[id])) {
+                                sprintf(err->output, "%s %s", err->output, entity->core[i]->data[id]);
+                            } else {
+                                sprintf(err->output, "%s \"%s\"", err->output, entity->core[i]->data[id]);
+                            }
+                        }
+
+                        if(j == stack->indexed[i].size - 1) {
+                            sprintf(err->output, "%s\n", err->output);
+                        }
+                    }
+                }
+            }
+
+            if(err->err) {
+                printStackError(err, debug);
+            } else {
+                success(err->output);
             }
 
             destroyStack(stack);
@@ -323,6 +384,8 @@ void updateTableOption()
 
         if(err->err) {
             printStackError(err, debug);
+        } else {
+            success(err->output);
         }
     }
 
@@ -367,6 +430,9 @@ void deleteTableOption()
 
         if(err->err) {
             printStackError(err, debug);
+        } else {
+            strcat(err->output, "\n");
+            success(err->output);
         }
     }
 
@@ -388,7 +454,13 @@ void dropTableOption()
     char *table = interface.input("table> ");
 
     Throw *err = (Throw *)yaml.table.drop(database, table);
-    printStackError(err, debug);
+
+    if(err->err) {
+        printStackError(err, debug);
+    } else {
+        strcat(err->output, "\n");
+        success(err->output);
+    }
 
     _safeFree(&database);
     _safeFree(&table);

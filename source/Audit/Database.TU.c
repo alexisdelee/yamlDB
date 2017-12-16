@@ -85,7 +85,7 @@ int main(int argc, char **argv)
         whereStatement(&statement, "=", "username", "lucy@gmail.com");
 
         secureSet(&test.err, test.yaml.table.select("default", "test", test.entity, (void **)(&test.stack), statement));
-        assert(test.err->err == false && test.stack->size == 1 && test.stack->indexed[0].active == NULL && test.stack->indexed[0].size == 3);
+        assert(test.err->err == false && test.stack->size == 1 && test.stack->indexed[0].active == true && test.stack->indexed[0].size == 3);
         welcome("%2s[ok] Select a line with all properties in a table\n", "");
 
         destroyStack(test.stack);
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
         whereStatement(&statement, "=", "username", "lucy@gmail.com");
 
         secureSet(&test.err, test.yaml.table.select("default", "test", test.entity, (void **)(&test.stack), statement));
-        assert(test.err->err == false && test.stack->size == 1 && test.stack->indexed[0].active == NULL && test.stack->indexed[0].size == 2);
+        assert(test.err->err == false && test.stack->size == 1 && test.stack->indexed[0].active == true && test.stack->indexed[0].size == 2);
         welcome("%2s[ok] Select a line with \"username\" and \"capitalize\" properties in a table\n", "");
 
         destroyStack(test.stack);
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
         whereStatement(&statement, "@", "", "");
 
         secureSet(&test.err, test.yaml.table.select("default", "test", test.entity, (void **)(&test.stack), statement));
-        assert(test.err->err == false && test.stack->size == 1 && test.stack->indexed[0].active == false);
+        assert(test.err->err == false && test.stack->size == 1 && test.stack->indexed[0].active == true);
         welcome("%2s[ok] Delete a line in a table\n", "");
 
         destroyStack(test.stack);
